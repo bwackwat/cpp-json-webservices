@@ -90,5 +90,7 @@ void Connection::delivered_done(const system::error_code& ec, std::size_t length
 		_log("delivered_done async_write_some error (" + std::to_string(ec.value()) + "): " + ec.message());
 		return;
 	}
+	conn_socket.shutdown(asio::ip::tcp::socket::shutdown_both);
 	conn_socket.close();
+	delete this;
 }

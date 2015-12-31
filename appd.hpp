@@ -15,6 +15,7 @@
 #include <boost\bind.hpp>
 
 #include "conn.hpp"
+#include "pool.hpp"
 
 #include "rapidjson/document.h"
 
@@ -24,12 +25,13 @@ using namespace boost;
 
 class AppDaemon {
 private:
-	asio::io_service appd_io_service;
+	ServicePool service_pool;
 	asio::ip::tcp::acceptor appd_acceptor;
-	asio::ip::tcp::socket appd_socket;
 
 	void connection_acceptor(const system::error_code& ec, Connection* new_connection);
 public:
+	int port;
+
 	std::map<std::string, std::string(*)(Document *json)> routes;
 	std::map<std::string, std::vector<std::string>> required_fields;
 

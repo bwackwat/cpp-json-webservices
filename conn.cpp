@@ -88,7 +88,7 @@ void Connection::received(const system::error_code& ec, std::size_t length) {
 void Connection::delivered_done(const system::error_code& ec, std::size_t length) {
 	if (ec) {
 		_log("delivered_done async_write_some error (" + std::to_string(ec.value()) + "): " + ec.message());
-		return;
+		//return;
 	}
 	conn_socket.shutdown(asio::ip::tcp::socket::shutdown_both);
 	conn_socket.close();

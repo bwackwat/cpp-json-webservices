@@ -33,15 +33,16 @@ void AppDaemon::connection_acceptor(const system::error_code& ec, Connection* ne
 
 	new_connection->start_receiving();
 
-	Connection* next_connection = new Connection(this, appd_io_service);
+	Connection* next_connection = new Connection(this, service_pool.get_io_service());
 
 	appd_acceptor.async_accept(next_connection->conn_socket,
 		bind(&AppDaemon::connection_acceptor, this, asio::placeholders::error, next_connection));
 }
 
 AppDaemon::AppDaemon(int port)
-	: appd_acceptor(appd_io_service, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port)),
-	appd_socket(appd_io_service) {}
+	: port(port),
+	service_pool(),
+	appd_acceptor(service_pool.get_io_service(), asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port)) {}
 
 void AppDaemon::route(std::string path, std::string(*func)(Document *json), std::vector<std::string> requires){
 	AppDaemon::routes[path] = func;
@@ -50,7 +51,7 @@ void AppDaemon::route(std::string path, std::string(*func)(Document *json), std:
 
 void AppDaemon::listen(){
 	try {
-		Connection* next_connection = new Connection(this, appd_io_service);
+		Connection* next_connection = new Connection(this, service_pool.get_io_service());
 
 		appd_acceptor.async_accept(next_connection->conn_socket,
 			bind(&AppDaemon::connection_acceptor, this, asio::placeholders::error, next_connection));
@@ -60,9 +61,11 @@ void AppDaemon::listen(){
 	}
 
 	try {
-		appd_io_service.run();
+		service_pool.run();
 	}
 	catch (std::exception& e) {
 		std::cerr << "appd_io_service.run() exception: " << e.what() << "\n";
 	}
+
+	std::cout << "Listening on " << port << "!" << std::endl;
 }

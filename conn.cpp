@@ -7,7 +7,7 @@
 
 #include "util.hpp"
 #include "conn.hpp"
-#include "appd.hpp"
+#include "serv.hpp"
 
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
@@ -40,8 +40,8 @@ std::string validate_request(char *data, Document *doc, std::vector<std::string>
 	return std::string();
 }
 
-Connection::Connection(AppDaemon* server, asio::io_service& io_service)
-: appd_reference(server),
+Connection::Connection(WebService* service, asio::io_service& io_service)
+	: serv_reference(service),
 conn_socket(io_service){
 }
 
@@ -65,12 +65,12 @@ void Connection::received(const system::error_code& ec, std::size_t length) {
 	char *received_body = strstr(received_data, "\r\n\r\n") + 4;
 	std::cout << "DATA: |" << received_body << "|" << std::endl;
 
-	if (appd_reference->routes.count(path)){
-		auto f = appd_reference->routes[path];
+	if (serv_reference->routes.count(path)){
+		auto f = serv_reference->routes[path];
 
 		Document doc;
 
-		auto result = validate_request(received_body, &doc, appd_reference->required_fields[path]);
+		auto result = validate_request(received_body, &doc, serv_reference->required_fields[path]);
 		if (!result.empty()){
 			delivery_data = result;
 		}

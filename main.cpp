@@ -5,7 +5,7 @@
 #include <string>
 
 #include "util.hpp"
-#include "appd.hpp"
+#include "serv.hpp"
 
 #include "rapidjson/document.h"
 
@@ -23,7 +23,7 @@ std::string newuser(Document *json){
 
 int main(int argc, char** argv){
 	try{
-		AppDaemon api(3000);
+		WebService api(3000);
 
 		api.route("/", root);
 		api.route("/user/new", newuser, { "username", "password" });

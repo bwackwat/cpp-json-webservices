@@ -1,12 +1,11 @@
-#ifndef APPD_POOL
-#define APPD_POOL
+#pragma once
 
 #include <memory>
 #include <iostream>
 #include <utility>
 #include "util.hpp"
 #include "conn.hpp"
-#include "appd.hpp"
+#include "serv.hpp"
 
 #include <boost\asio.hpp>
 #include <boost\lexical_cast.hpp>
@@ -28,5 +27,3 @@ private:
 	std::vector<work_ptr> workers;
 	std::size_t next_io_service;
 };
-
-#endif

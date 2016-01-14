@@ -36,11 +36,11 @@ ServicePool::ServicePool()
 void ServicePool::run()
 {
 	// Create a pool of threads to run all of the io_services.
-	std::vector<shared_ptr<thread> > threads;
+	std::vector<shared_ptr<thread>> threads;
 	for (std::size_t i = 0; i < io_services.size(); ++i)
 	{
-		shared_ptr<thread> thread(new thread(bind(&asio::io_service::run, io_services[i])));
-		threads.push_back(thread);
+		shared_ptr<thread> next_thread(new thread(bind(&asio::io_service::run, io_services[i])));
+		threads.push_back(next_thread);
 	}
 
 	// Wait for all threads in the pool to exit.

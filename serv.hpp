@@ -10,8 +10,8 @@
 
 #include <set>
 
-#include <boost\asio.hpp>
-#include <boost\bind.hpp>
+#include <boost/asio.hpp>
+#include <boost/bind.hpp>
 
 #include "conn.hpp"
 #include "pool.hpp"

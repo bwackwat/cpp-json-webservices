@@ -2,8 +2,8 @@
 #include <iostream>
 #include <utility>
 
-#include <boost\asio.hpp>
-#include <boost\lexical_cast.hpp>
+#include <boost/asio.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include "util.hpp"
 #include "conn.hpp"

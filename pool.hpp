@@ -14,10 +14,11 @@ using namespace boost;
 
 class ServicePool {
 public:
+	ServicePool();
+
 	void run();
 	asio::io_service& get_io_service();
 
-	ServicePool();
 private:
 	typedef shared_ptr<asio::io_service> io_service_ptr;
 	typedef shared_ptr<asio::io_service::work> work_ptr;

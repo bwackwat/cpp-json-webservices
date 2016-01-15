@@ -40,8 +40,8 @@ std::string validate_request(char *data, Document *doc, std::vector<std::string>
 }
 
 Connection::Connection(WebService* service, asio::io_service& io_service)
-	: serv_reference(service),
-conn_socket(io_service){
+	: conn_socket(io_service),
+	serv_reference(service) {
 }
 
 void Connection::start_receiving(){

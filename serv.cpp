@@ -36,9 +36,9 @@ void WebService::connection_acceptor(const system::error_code& ec, Connection* n
 		bind(&WebService::connection_acceptor, this, asio::placeholders::error, next_connection));
 }
 
-WebService::WebService(int port)
-	: service_pool(),
-	port(port),
+WebService::WebService(int the_port)
+	: port(the_port),
+	service_pool(),
 	serv_acceptor(service_pool->get_io_service(), asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port)) {}
 
 void WebService::route(std::string path, std::string(*func)(Document *json), std::vector<std::string> requires){

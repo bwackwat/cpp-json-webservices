@@ -3,28 +3,24 @@
 #include <memory>
 #include <iostream>
 #include <fstream>
-
 #include <atomic>
-
 #include <thread>
-
 #include <set>
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 
-#include "conn.hpp"
-#include "pool.hpp"
-
 #include "rapidjson/document.h"
 
 using namespace rapidjson;
-
 using namespace boost;
+
+class Connection;
+class ServicePool;
 
 class WebService {
 private:
-	ServicePool service_pool;
+	ServicePool* service_pool;
 	asio::ip::tcp::acceptor serv_acceptor;
 
 	void connection_acceptor(const system::error_code& ec, Connection* new_connection);

@@ -1,16 +1,17 @@
 #include <memory>
 #include <iostream>
 #include <utility>
-#include "util.hpp"
-#include "conn.hpp"
-#include "serv.hpp"
-#include "pool.hpp"
+#include <thread>
 
 #include <boost/asio.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
+
+#include "pool.hpp"
+
+using namespace boost;
 
 ServicePool::ServicePool()
 : next_io_service(0){

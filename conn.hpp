@@ -6,13 +6,12 @@
 
 #include <boost/asio.hpp>
 
-class WebService;
-
 #include "rapidjson/document.h"
 
 using namespace rapidjson;
-
 using namespace boost;
+
+class WebService;
 
 class Connection {
 public:

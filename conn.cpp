@@ -5,32 +5,31 @@
 #include <boost/asio.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include "util.hpp"
-#include "conn.hpp"
-#include "serv.hpp"
-
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/error/error.h"
 
-using namespace rapidjson;
+#include "util.hpp"
+#include "conn.hpp"
+#include "serv.hpp"
 
+using namespace rapidjson;
 using namespace boost;
 
 std::string validate_request(char *data, Document *doc, std::vector<std::string> requires){
 	std::stringstream response;
 
-	(*doc).Parse(data);
-	if ((*doc).HasParseError()){
-		int offset = (*doc).GetErrorOffset() - 1;
+	doc->Parse(data);
+	if (doc->HasParseError()){
+		int offset = doc->GetErrorOffset() - 1;
 		response << "Invalid JSON at character " << offset << ": '" << data[offset] << "'.";
 
 		return json_error(response.str());
 	}
 
 	for (std::vector<int>::size_type i = 0; i != requires.size(); i++){
-		if (!(*doc).HasMember(requires[i].c_str())){
+		if (!doc->HasMember(requires[i].c_str())){
 			response << "'" << requires[i] << "' requires a value.";
 
 			return json_error(response.str());

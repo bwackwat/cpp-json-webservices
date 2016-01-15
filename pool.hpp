@@ -3,15 +3,14 @@
 #include <memory>
 #include <iostream>
 #include <utility>
-#include "util.hpp"
-#include "conn.hpp"
-#include "serv.hpp"
 
 #include <boost/asio.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
+
+using namespace boost;
 
 class ServicePool {
 public:

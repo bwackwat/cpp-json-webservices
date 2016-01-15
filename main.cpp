@@ -4,10 +4,9 @@
 #include <fstream>
 #include <string>
 
-#include "util.hpp"
-#include "serv.hpp"
-
 #include "rapidjson/document.h"
+
+#include "serv.hpp"
 
 using namespace rapidjson;
 

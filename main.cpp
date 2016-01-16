@@ -19,9 +19,31 @@ std::string root(Document *json){
 }
 
 std::string newuser(Document *json){
-	std::stringstream response;
-	response << "User:" << (*json)["username"].GetString() << "/" << (*json)["password"].GetString();
-	return response.str();
+	pqxx::connection conn("dbname=webservice user=postgres");
+	pqxx::work txn(conn);
+	pqxx::result res = txn.exec(
+		"UPSERT INTO users"
+		"(username, password, email, first_name, last_name) "
+		"VALUES (" +
+		txn.quote((*json)["username"].GetString()) + ", " +
+		txn.quote((*json)["password"].GetString()) + ", " +
+		txn.quote((*json)["email"].GetString()) + ", " +
+		txn.quote((*json)["first_name"].GetString()) + ", " +
+		txn.quote((*json)["last_name"].GetString()) + ", " +
+		txn.quote((*json)["username"].GetString()) +
+		");"
+	);
+
+	return res[0]["id"].as<const char *>();
+
+	StringBuffer response_buffer;
+	Writer<StringBuffer> writer(response_buffer);
+
+	writer.StartObject();
+	writer.String("results");
+	writer.StartArray();
+
+
 }
 
 std::string users(Document *json){
@@ -64,7 +86,8 @@ int main(int argc, char** argv){
 		WebService api(3000);
 
 		api.route("/", root);
-		api.route("/user/new", newuser, { "username", "password" });
+		api.route("/user/new", newuser,
+			{ "username", "password", "email", "first_name", "last_name" });
 		api.route("/users", users);
 
 		api.listen();

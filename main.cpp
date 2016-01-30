@@ -14,23 +14,24 @@
 
 using namespace rapidjson;
 
+const std::string POSTGRESQL_CONNSTRING = "dbname=webservice user=postgres password=aq12ws";
+
 std::string root(Document *json){
 	return "Welcome to the API.";
 }
 
 std::string newuser(Document *json){
-	pqxx::connection conn("dbname=webservice user=postgres");
+	pqxx::connection conn(POSTGRESQL_CONNSTRING);
 	pqxx::work txn(conn);
 	pqxx::result res = txn.exec(
-		"UPSERT INTO users"
+		"INSERT INTO users"
 		"(username, password, email, first_name, last_name) "
 		"VALUES (" +
 		txn.quote((*json)["username"].GetString()) + ", " +
 		txn.quote((*json)["password"].GetString()) + ", " +
 		txn.quote((*json)["email"].GetString()) + ", " +
 		txn.quote((*json)["first_name"].GetString()) + ", " +
-		txn.quote((*json)["last_name"].GetString()) + ", " +
-		txn.quote((*json)["username"].GetString()) +
+		txn.quote((*json)["last_name"].GetString()) +
 		");"
 	);
 
@@ -47,7 +48,7 @@ std::string newuser(Document *json){
 }
 
 std::string users(Document *json){
-	pqxx::connection conn("dbname=webservice user=postgres");
+	pqxx::connection conn(POSTGRESQL_CONNSTRING);
 	pqxx::work txn(conn);
 	pqxx::result res = txn.exec(
 		"SELECT * FROM users;"

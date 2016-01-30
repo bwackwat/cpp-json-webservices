@@ -21,8 +21,8 @@ std::string validate_request(char *data, Document *doc, std::vector<std::string>
 	std::stringstream response;
 
 	doc->Parse(data);
-	if (doc->HasParseError()){
-		int offset = doc->GetErrorOffset() - 1;
+	if (doc->HasParseError() && requires.size() > 0){
+		int offset = doc->GetErrorOffset();
 		response << "Invalid JSON at character " << offset << ": '" << data[offset] << "'.";
 
 		return json_error(response.str());

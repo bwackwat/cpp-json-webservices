@@ -64,6 +64,8 @@ void Connection::received(const system::error_code& ec, std::size_t length) {
 	char *received_body = strstr(received_data, "\r\n\r\n") + 4;
 	std::cout << "DATA: |" << received_body << "|" << std::endl;
 
+	std::string delivery_json;
+
 	if (serv_reference->routes.count(path)){
 		auto f = serv_reference->routes[path];
 
@@ -71,15 +73,24 @@ void Connection::received(const system::error_code& ec, std::size_t length) {
 
 		auto result = validate_request(received_body, &doc, serv_reference->required_fields[path]);
 		if (!result.empty()){
-			delivery_data = result;
+			delivery_json = result;
 		}
 		else{
-			delivery_data = f(&doc);
+			delivery_json = f(&doc);
 		}
 	}
 	else{
-		delivery_data = "{\"error\":\"No resource.\"}";
+		delivery_json = "{\"error\":\"No resource.\"}";
 	}
+
+	delivery_data = "HTTP/1.1 200 OK\n";
+	delivery_data.append("Connection: close\n");
+	delivery_data.append("Server: bwackwat-raw-webservice\n");
+	delivery_data.append("Accept-Ranges: bytes\n");
+	delivery_data.append("Content-Type: text/html");
+	delivery_data.append("Content-Length: " + std::to_string(delivery_json.length()) + "\n");
+	delivery_data.append("\n");
+	delivery_data.append(delivery_json);
 
 	conn_socket.async_write_some(asio::buffer(delivery_data, delivery_data.length()), bind(&Connection::delivered_done, this, asio::placeholders::error, asio::placeholders::bytes_transferred));
 }

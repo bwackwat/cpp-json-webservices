@@ -17,34 +17,46 @@ using namespace rapidjson;
 const std::string POSTGRESQL_CONNSTRING = "dbname=webservice user=postgres password=aq12ws";
 
 std::string root(Document *json){
-	return "Welcome to the API.";
+	return "{\"result\":\"Welcome to the API.\"}";
 }
 
 std::string newuser(Document *json){
 	pqxx::connection conn(POSTGRESQL_CONNSTRING);
 	pqxx::work txn(conn);
-	pqxx::result res = txn.exec(
-		"INSERT INTO users"
-		"(username, password, email, first_name, last_name) "
-		"VALUES (" +
-		txn.quote((*json)["username"].GetString()) + ", " +
-		txn.quote((*json)["password"].GetString()) + ", " +
-		txn.quote((*json)["email"].GetString()) + ", " +
-		txn.quote((*json)["first_name"].GetString()) + ", " +
-		txn.quote((*json)["last_name"].GetString()) +
-		");"
-	);
+	pqxx::result res;	
 
-	return res[0]["id"].as<const char *>();
+	try{
+		res = txn.exec(
+			"INSERT INTO users"
+			"(id, username, password, email, first_name, last_name) "
+			"VALUES (DEFAULT, " +
+			txn.quote((*json)["username"].GetString()) + ", " +
+			txn.quote((*json)["password"].GetString()) + ", " +
+			txn.quote((*json)["email"].GetString()) + ", " +
+			txn.quote((*json)["first_name"].GetString()) + ", " +
+			txn.quote((*json)["last_name"].GetString()) +
+			") RETURNING id;"
+		);
+	}catch(const pqxx::pqxx_exception &e){
+		std::string error = e.base().what();
+		auto start = error.find("DETAIL") + 9;
+		auto end = error.find("\n", start);
+		return "{\"error\":\"" + error.substr(start, end - start) + "\"}";
+	}
+	txn.commit();
 
 	StringBuffer response_buffer;
 	Writer<StringBuffer> writer(response_buffer);
 
 	writer.StartObject();
-	writer.String("results");
-	writer.StartArray();
+	writer.String("result");
+	writer.StartObject();
+	writer.String("id");
+	writer.String(res[0]["id"].as<const char *>());
+	writer.EndObject();
+	writer.EndObject();
 
-
+	return response_buffer.GetString();
 }
 
 std::string users(Document *json){

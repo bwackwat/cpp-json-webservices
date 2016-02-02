@@ -41,7 +41,7 @@ WebService::WebService(int the_port)
 	service_pool(new ServicePool()),
 	serv_acceptor(service_pool->get_io_service(), asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port)) {}
 
-void WebService::route(std::string path, std::string(*func)(Document *json), std::vector<std::string> requires){
+void WebService::route(std::string path, std::string(*func)(Document *json), std::vector<std::pair<std::string, Type>> requires){
 	WebService::routes[path] = func;
 	WebService::required_fields[path] = requires;
 }

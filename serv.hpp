@@ -23,10 +23,10 @@ public:
 	int port;
 
 	std::map<std::string, std::string(*)(Document *json)> routes;
-	std::map<std::string, std::vector<std::string>> required_fields;
+	std::map<std::string, std::vector<std::pair<std::string, Type>>> required_fields;
 
 	WebService(int the_port);
-	void route(std::string path, std::string(*func)(Document *json), std::vector<std::string> requires = {});
+	void route(std::string path, std::string(*func)(Document *json), std::vector<std::pair<std::string, Type>> requires = {});
 	void listen();
 private:
 	ServicePool* service_pool;

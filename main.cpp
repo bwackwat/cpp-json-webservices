@@ -109,24 +109,24 @@ std::string login(Document *json){
 	if(given_hash == res[0]["password"].as<const char *>()){
 		std::cout << "CORRECT PASSWORD!" << std::endl;
 
-		StringBuffer response_buffer;
-		Writer<StringBuffer> writer(response_buffer);
+		StringBuffer token_buffer;
+		Writer<StringBuffer> token_writer(token_buffer);
 
-		writer.StartObject();
-		writer.String("id");
-		writer.Int(res[0]["id"].as<int>());
-		writer.String("username");
-		writer.String(res[0]["username"].as<const char *>());
-		writer.String("proof");
-		writer.String(given_hash.substr(given_hash.length() / 2).c_str());
-		writer.EndObject();
+		token_writer.StartObject();
+		token_writer.String("id");
+		token_writer.Int(res[0]["id"].as<int>());
+		token_writer.String("username");
+		token_writer.String(res[0]["username"].as<const char *>());
+		token_writer.String("proof");
+		token_writer.String(given_hash.substr(given_hash.length() / 2).c_str());
+		token_writer.EndObject();
 
-		std::string tokendata = response_buffer.GetString();
+		std::string tokendata = token_buffer.GetString();
 
 		std::cout << "UGITOKEN:" << tokendata << std::endl;
 
-		response_buffer.Clear();
-		writer.Reset(response_buffer);
+		StringBuffer response_buffer;
+		Writer<StringBuffer> writer(response_buffer);
 
 		writer.StartObject();
 		writer.String("result");
@@ -196,11 +196,27 @@ std::string users(Document *json){
 	pqxx::result res;
 
 	try{
+		std::string tokenjson = decrypt_from_webtoken((*json)["token"].GetString());
+		std::cout << "JSON:" << tokenjson << ":END" << std::endl;
+
 		Document tokendata;
-		tokendata.Parse(decrypt_from_webtoken((*json)["token"].GetString()).c_str());
+		if(tokendata.Parse(tokenjson.c_str()).HasParseError()){
+			throw std::runtime_error("Token parse error.");
+		}
+
+		//MAKE SURE TOKEN HAS THE FIELDS THEY ARE MADE WITH
+		if(!tokendata.HasMember("id") ||
+		tokendata["id"].GetType() != kNumberType ||
+		!tokendata.HasMember("username") ||
+		tokendata["username"].GetType() != kStringType ||
+		!tokendata.HasMember("proof") ||
+		tokendata["proof"].GetType() != kStringType){
+			throw std::runtime_error("Token missing parameter.");
+		}
+
 		res = txn.exec(
 			"SELECT * FROM users WHERE id = " +
-			std::to_string(tokendata["id"].GetInt()) + ";"
+			txn.quote(std::to_string(tokendata["id"].GetInt())) + ";"
 		);
 		if(res.size() == 0){
 			throw std::runtime_error("Token with invalid username.");
@@ -257,14 +273,22 @@ int main(int argc, char** argv){
 
 		api.route("/", root);
 
-		api.route("/user/new", newuser,
-			{ "username", "password", "email", "first_name", "last_name" });
+		api.route("/user/new", newuser, {
+			{"username", kStringType},
+			{"password", kStringType},
+			{"email", kStringType},
+			{"first_name", kStringType},
+			{"last_name", kStringType}
+		});
 
-		api.route("/users", users,
-			{ "token" });
+		api.route("/users", users, {
+			{"token", kStringType}
+		});
 
-		api.route("/login",login,
-			{ "username", "password" });
+		api.route("/login",login, {
+			{"username", kStringType},
+			{"password", kStringType}
+		});
 
 		api.listen();
 	}

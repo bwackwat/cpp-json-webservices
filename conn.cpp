@@ -17,7 +17,9 @@
 using namespace rapidjson;
 using namespace boost;
 
-std::string validate_request(char *data, Document *doc, std::vector<std::string> requires){
+static const char* kTypeNames[] = { "Null", "False", "True", "Object", "Array", "String", "Number" };
+
+std::string validate_request(char *data, Document *doc, std::vector<std::pair<std::string, Type>> requires){
 	std::stringstream response;
 
 	doc->Parse(data);
@@ -29,8 +31,9 @@ std::string validate_request(char *data, Document *doc, std::vector<std::string>
 	}
 
 	for (std::vector<int>::size_type i = 0; i != requires.size(); i++){
-		if (!doc->HasMember(requires[i].c_str())){
-			response << "'" << requires[i] << "' requires a value.";
+		if (!doc->HasMember(requires[i].first.c_str())
+		|| (*doc)[requires[i].first.c_str()].GetType() != requires[i].second){
+			response << "'" << requires[i].first << "' requires a " << kTypeNames[requires[i].second] << ".";
 
 			return json_error(response.str());
 		}

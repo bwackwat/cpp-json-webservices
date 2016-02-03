@@ -13,6 +13,7 @@
 #include "util.hpp"
 #include "conn.hpp"
 #include "serv.hpp"
+#include "myapi.hpp"
 
 using namespace rapidjson;
 using namespace boost;
@@ -27,7 +28,7 @@ std::string validate_request(char *data, Document *doc, std::vector<std::pair<st
 		int offset = doc->GetErrorOffset();
 		response << "Invalid JSON at character " << offset << ": '" << data[offset] << "'.";
 
-		return json_error(response.str());
+		return simple_error_json(response.str());
 	}
 
 	for (std::vector<int>::size_type i = 0; i != requires.size(); i++){
@@ -35,7 +36,7 @@ std::string validate_request(char *data, Document *doc, std::vector<std::pair<st
 		|| (*doc)[requires[i].first.c_str()].GetType() != requires[i].second){
 			response << "'" << requires[i].first << "' requires a " << kTypeNames[requires[i].second] << ".";
 
-			return json_error(response.str());
+			return simple_error_json(response.str());
 		}
 	}
 
@@ -53,7 +54,7 @@ void Connection::start_receiving(){
 
 void Connection::received(const system::error_code& ec, std::size_t length) {
 	if (ec) {
-		_log("received async_read_some error (" + std::to_string(ec.value()) + "): " + ec.message());
+		std::cout << "received async_read_some error (" << ec.value() << "): " << ec.message() << std::endl;
 		return;
 	}
 	received_data[length] = '\0';
@@ -88,7 +89,7 @@ void Connection::received(const system::error_code& ec, std::size_t length) {
 
 	delivery_data = "HTTP/1.1 200 OK\n";
 	delivery_data.append("Connection: close\n");
-	delivery_data.append("Server: bwackwat-raw-webservice\n");
+	delivery_data.append("Server: " + serv_reference->GetName() + "\n");
 	delivery_data.append("Accept-Ranges: bytes\n");
 	delivery_data.append("Content-Type: text/html");
 	delivery_data.append("Content-Length: " + std::to_string(delivery_json.length()) + "\n");
@@ -100,8 +101,7 @@ void Connection::received(const system::error_code& ec, std::size_t length) {
 
 void Connection::delivered_done(const system::error_code& ec, std::size_t length) {
 	if (ec) {
-		_log("delivered_done async_write_some error (" + std::to_string(ec.value()) + "): " + ec.message());
-		//return;
+		std::cout << "delivered_done async_write_some error (" << ec.value() << "): " << ec.message() << std::endl;
 	}
 	conn_socket.shutdown(asio::ip::tcp::socket::shutdown_both);
 	conn_socket.close();

@@ -20,15 +20,16 @@ class ServicePool;
 
 class WebService {
 public:
-	int port;
-
 	std::map<std::string, std::string(*)(Document *json)> routes;
 	std::map<std::string, std::vector<std::pair<std::string, Type>>> required_fields;
 
-	WebService(int the_port);
+	WebService(int port, std::string service_name);
 	void route(std::string path, std::string(*func)(Document *json), std::vector<std::pair<std::string, Type>> requires = {});
 	void listen();
+	std::string GetName();
 private:
+	int port;
+	std::string service_name;
 	ServicePool* service_pool;
 	asio::ip::tcp::acceptor serv_acceptor;
 

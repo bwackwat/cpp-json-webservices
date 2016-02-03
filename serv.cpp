@@ -23,8 +23,8 @@ using namespace rapidjson;
 using namespace boost;
 
 void WebService::connection_acceptor(const system::error_code& ec, Connection* new_connection) {
-	if (ec) {
-		_log("async_accept error (" + std::to_string(ec.value()) + "): " + ec.message());
+	if (ec) {		
+		std::cout << "connection_acceptor async_accept error (" << ec.value() << "): " << ec.message() << std::endl;
 		return;
 	}
 
@@ -36,8 +36,9 @@ void WebService::connection_acceptor(const system::error_code& ec, Connection* n
 		bind(&WebService::connection_acceptor, this, asio::placeholders::error, next_connection));
 }
 
-WebService::WebService(int the_port)
-	: port(the_port),
+WebService::WebService(int port, std::string service_name)
+	: port(port),
+	service_name(service_name),
 	service_pool(new ServicePool()),
 	serv_acceptor(service_pool->get_io_service(), asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port)) {}
 
@@ -57,7 +58,7 @@ void WebService::listen(){
 		std::cerr << "appd_acceptor.async_accept exception: " << e.what() << "\n";
 	}
 
-	std::cout << "Listening on port " << port << "!" << std::endl;
+	std::cout << "Listening on port " << port << " with PID " << ::getpid() << "." << std::endl;
 
 	try {
 		service_pool->run();
@@ -67,4 +68,8 @@ void WebService::listen(){
 	}
 
 	std::cout << "Service on port " << port << " is down!" << std::endl;
+}
+
+std::string WebService::GetName(){
+	return service_name;
 }

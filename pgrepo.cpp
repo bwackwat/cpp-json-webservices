@@ -20,27 +20,34 @@ pqxx::result PostgresRepository::GetUsers(){
 
 pqxx::result PostgresRepository::GetUserById(std::string id){
 	pqxx::work txn(conn);
-	return SQLWrap(&txn, "SELECT * FROM users WHERE"
+	return SQLWrap(&txn, "SELECT * FROM users WHERE "
 		"id = " + txn.quote(id) + ";");
 }
 
 pqxx::result PostgresRepository::GetUserByUsername(std::string username){
 	pqxx::work txn(conn);
-	return SQLWrap(&txn, "SELECT * FROM users WHERE"
+	return SQLWrap(&txn, "SELECT * FROM users WHERE "
 		"username = " + txn.quote(username) + ";");
 }
 
 pqxx::result PostgresRepository::GetUserByEmail(std::string email){
 	pqxx::work txn(conn);
-	return SQLWrap(&txn, "SELECT * FROM users WHERE"
+	return SQLWrap(&txn, "SELECT * FROM users WHERE "
 		"email = " + txn.quote(email) + ";");
 }
 
 pqxx::result PostgresRepository::GetUserByLogin(std::string login){
 	pqxx::work txn(conn);
-	return SQLWrap(&txn, "SELECT * FROM users WHERE"
-		" username = " + txn.quote(login) + " OR "
-		" email = " + txn.quote(login) + ";");
+	return SQLWrap(&txn, "SELECT * FROM users WHERE "
+		"username = " + txn.quote(login) + " OR "
+		"email = " + txn.quote(login) + ";");
+}
+
+pqxx::result PostgresRepository::GetUserByUsernameOrEmail(std::string username, std::string email){
+	pqxx::work txn(conn);
+	return SQLWrap(&txn, "SELECT * FROM users WHERE "
+		"username = " + txn.quote(username) + " OR "
+		"email = " + txn.quote(email) + ";");
 }
 
 pqxx::result PostgresRepository::CreateUser(std::string username, std::string password, std::string email, std::string first_name, std::string last_name){

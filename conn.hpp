@@ -1,14 +1,7 @@
 #pragma once
 
-#include <memory>
-#include <iostream>
-#include <utility>
-
 #include <boost/asio.hpp>
 
-#include "rapidjson/document.h"
-
-using namespace rapidjson;
 using namespace boost;
 
 class WebService;

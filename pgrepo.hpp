@@ -13,6 +13,7 @@ public:
 	pqxx::result GetUserByUsername(std::string username);
 	pqxx::result GetUserByEmail(std::string email);
 	pqxx::result GetUserByLogin(std::string login);
+	pqxx::result GetUserByUsernameOrEmail(std::string username, std::string email);
 	
 	pqxx::result CreateUser(std::string username, std::string password, std::string email, std::string first_name, std::string last_name);
 

@@ -2,10 +2,6 @@
 
 #include <memory>
 #include <iostream>
-#include <fstream>
-#include <atomic>
-#include <thread>
-#include <set>
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>

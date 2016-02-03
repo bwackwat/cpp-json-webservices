@@ -1,26 +1,20 @@
 #include <memory>
 #include <iostream>
-#include <fstream>
-#include <atomic>
 #include <thread>
-#include <set>
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/chrono.hpp>
 
 #include "rapidjson/document.h"
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
-#include "rapidjson/error/error.h"
 
 #include "pool.hpp"
 #include "util.hpp"
 #include "serv.hpp"
 #include "conn.hpp"
 
-using namespace rapidjson;
 using namespace boost;
+using namespace rapidjson;
 
 void WebService::connection_acceptor(const system::error_code& ec, Connection* new_connection) {
 	if (ec) {		

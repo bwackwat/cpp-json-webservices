@@ -15,6 +15,9 @@
 #include "cryptopp/filters.h"
 #include "cryptopp/cryptlib.h"
 
+#include <redox.hpp>
+using namespace redox;
+
 #include "util.hpp"
 
 //using namespace rapidjson;
@@ -22,12 +25,23 @@
 //Tokens will only remain valid for the duration this WebService runs.
 byte* token_key = new byte[CryptoPP::AES::MAX_KEYLENGTH];
 byte* token_iv = new byte[CryptoPP::AES::BLOCKSIZE];
+std::string nonce;
 
 void init_crypto(){
 	CryptoPP::AutoSeededRandomPool rand_tool;
 
 	rand_tool.GenerateBlock(token_key, CryptoPP::AES::MAX_KEYLENGTH);
 	rand_tool.GenerateBlock(token_iv, CryptoPP::AES::BLOCKSIZE);
+	
+	Redox rdx;
+	if(!rdx.connect("localhost", 6379)){
+		std::cerr << "No localhost redis for configuration." << std::endl;
+		return 1;		
+	}
+	
+	nonce = rdx.get("ARGON2_SALT");
+	
+	rdx.disconnect();
 }
 
 std::string simple_error_json(std::string message){

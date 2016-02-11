@@ -1,0 +1,4 @@
+SET WEBSERVICE_PORT 8000
+SET WEBSERVICE_HOST www.your-web-service.com
+SET POSTGRES_MASTER_CONNECTION_STRING "dbname=webservice user=postgres password=abc123"
+SET ARGON2_SALT makesuretouse16!

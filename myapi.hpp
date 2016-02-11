@@ -7,8 +7,8 @@ using namespace rapidjson;
 class WebService;
 class PostgresRepository;
 
-class UserService : public WebService {
+class MyApi : public WebService {
 public:
 	static PostgresRepository* repo;
-	UserService(int port, std::string name, std::string connection_string);
+	MyApi(int port, std::string name, std::string connection_string);
 };

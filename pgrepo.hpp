@@ -14,8 +14,10 @@ public:
 	pqxx::result GetUserByEmail(std::string email);
 	pqxx::result GetUserByLogin(std::string login);
 	pqxx::result GetUserByUsernameOrEmail(std::string username, std::string email);
-	
 	pqxx::result CreateUser(std::string username, std::string password, std::string email, std::string first_name, std::string last_name);
+	
+	pqxx::result GetPoiByUserId(std::string id);
+	pqxx::result CreatePoi(std::string owner, std::string label, std::string description, double longitude, double latitude);
 
 private:
 	pqxx::connection conn;

@@ -1,0 +1,42 @@
+body {
+	margin: 0px;
+}
+
+input {
+	margin: 5px;
+}
+
+button {
+	margin: 5px;
+}
+
+#demoMap {
+	border: 1px black solid;
+	height: 96vh;
+}
+
+#poiLongitude, #poiLatitude {
+	display: inline-block;
+}
+
+#banner {
+	background-color: lightblue;
+	border: 1px black solid;
+	height: 3vh;
+}
+
+.result {
+	color: red;
+}
+
+.modal {
+	background-color: lightblue;
+	position: fixed;
+	float: right;
+	top: 4vh;
+	left: 1vw;
+	margin: 0px;
+	padding: 10px;
+	z-index: 10000;
+	border: 1px black solid;
+}

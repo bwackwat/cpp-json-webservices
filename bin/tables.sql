@@ -1,10 +1,24 @@
 DROP TABLE users;
-
 CREATE TABLE users (
-	id serial PRIMARY KEY,
-	username varchar(50) UNIQUE NOT NULL,
-	password text NOT NULL,
-	email varchar(100) UNIQUE NOT NULL,
-	first_name varchar(50) NOT NULL,
-	last_name varchar(50) NOT NULL
+	id SERIAL PRIMARY KEY,
+	username VARCHAR(50) UNIQUE NOT NULL,
+	password TEXT NOT NULL,
+	email VARCHAR(100) UNIQUE NOT NULL,
+	first_name VARCHAR(50) NOT NULL,
+	last_name VARCHAR(50) NOT NULL,
+	created_on TIMESTAMP NOT NULL
 );
+ALTER TABLE users ALTER created_on SET DEFAULT now();
+
+CREATE EXTENSION postgis;
+
+DROP TABLE poi;
+CREATE TABLE poi (
+	id SERIAL PRIMARY KEY,
+	owner_id SERIAL NOT NULL,
+	label TEXT NOT NULL,
+	description TEXT NOT NULL,
+	location GEOGRAPHY(POINT, 900913) NOT NULL,
+	created_on TIMESTAMP NOT NULL
+);
+ALTER TABLE poi ALTER created_on SET DEFAULT now();

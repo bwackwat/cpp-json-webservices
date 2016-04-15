@@ -72,46 +72,20 @@ std::string newuser(Document *json){
 }
 
 std::string users(Document *json){
-	std::string tokenjson;
-	try{
-		tokenjson = decrypt_from_webtoken((*json)["token"].GetString());
-	}catch(const std::exception &e){
-		return simple_error_json("Invalid token.");
-	}
-	
 	Document tokendata;
-	if(tokendata.Parse(tokenjson.c_str()).HasParseError()){
-		return simple_error_json("Token parse error.");
+	try{
+		GetTokenData(&tokendata, json);
+	}catch(std::exception& e){
+		return simple_error_json(e.what());
 	}
 	
-	if(!tokendata.HasMember("id") ||
-	tokendata["id"].GetType() != kNumberType ||
-	!tokendata.HasMember("username") ||
-	tokendata["username"].GetType() != kStringType ||
-	!tokendata.HasMember("proof") ||
-	tokendata["proof"].GetType() != kStringType){
-		return simple_error_json("Token missing parameter.");
-	}
-	
-	pqxx::result res = MyApi::repo->GetUserById(std::to_string(tokendata["id"].GetInt()));
-	
-	if(res.size() == 0){
-		return simple_error_json("Token with invalid username.");
-	}
-	
-	std::string pwd = res[0]["password"].as<const char *>();
-	
-	if(tokendata["proof"].GetString() != pwd.substr(pwd.length() / 2)){
-		return simple_error_json("Token with invalid password.");
-	}
-	
-	res = MyApi::repo->GetUsers();
+	pqxx::result res = MyApi::repo->GetUsers();
 
 	StringBuffer response_buffer;
 	Writer<StringBuffer> writer(response_buffer);
 
 	writer.StartObject();
-	writer.String("results");
+	writer.String("result");
 	writer.StartArray();
 
 	for(pqxx::result::size_type i = 0; i < res.size(); i++){

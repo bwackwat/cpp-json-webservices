@@ -36,7 +36,7 @@ void init_crypto(){
 	Redox rdx;
 	if(!rdx.connect("localhost", 6379)){
 		std::cerr << "No localhost redis for configuration." << std::endl;
-		return 1;		
+		return;
 	}
 	
 	nonce = rdx.get("ARGON2_SALT");

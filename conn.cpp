@@ -95,6 +95,8 @@ void Connection::received(const system::error_code& ec, std::size_t length) {
 	delivery_data.append("Content-Length: " + std::to_string(delivery_json.length()) + "\n");
 	delivery_data.append("\n");
 	delivery_data.append(delivery_json);
+	
+	std::cout << "DELI: |" << delivery_json << "|" << std::endl;
 
 	conn_socket.async_write_some(asio::buffer(delivery_data, delivery_data.length()), bind(&Connection::delivered_done, this, asio::placeholders::error, asio::placeholders::bytes_transferred));
 }

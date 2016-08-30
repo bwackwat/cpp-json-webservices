@@ -1,0 +1,19 @@
+<h2>Contact Form</h2>
+<h4 id="result">Feel free to ask me any questions! I'm usually a busy fellow, but I don't ignore emails.</h4>
+<div id="contactForm">
+	<input id="fromname" type="text" placeholder="Your Full Name (if you want me to know you)"/>
+	<br>
+	<input id="fromemail" type="email" placeholder="Your Email Address (if you want a response)"/>
+	<br>
+	<input id="subject" type="text" placeholder="A Subject"/>
+	<br>
+	<textarea id="message" placeholder="A Message"></textarea>
+	<br>
+	<table><tr><td>Human Test Question: </td><td id="testquestion"></td></tr></table>
+	<input id="testanswer" type="text" placeholder="Answer"/>
+	<br>
+	<input id="submitPost" type="button" value="Submit" onclick="submitMessage()"/>
+</div>
+<script type="text/javascript">
+	setTimeout(connectToContactServer, 500);
+</script>

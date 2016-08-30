@@ -18,7 +18,17 @@ CREATE TABLE poi (
 	owner_id SERIAL NOT NULL,
 	label TEXT NOT NULL,
 	description TEXT NOT NULL,
-	location GEOGRAPHY(POINT, 900913) NOT NULL,
+	location GEOGRAPHY(POINT, 4326) NOT NULL,
 	created_on TIMESTAMP NOT NULL
 );
 ALTER TABLE poi ALTER created_on SET DEFAULT now();
+
+DROP TABLE posts;
+CREATE TABLE posts (
+	id SERIAL PRIMARY KEY,
+	owner_id SERIAL NOT NULL,
+	title TEXT NOT NULL,
+	content TEXT NOT NULL,
+	created_on TIMESTAMP NOT NULL
+);
+ALTER TABLE posts ALTER created_on SET DEFAULT now();

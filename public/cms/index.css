@@ -1,0 +1,49 @@
+html {
+	font-family: "Open Sans";
+}
+
+textarea, input {
+	margin: 10px;
+	height: 40px;
+}
+
+input[type="button"] {
+	border: 1px solid #CCC;
+	padding: 10px 25px 10px 25px;
+	color: #333;
+	border-radius: 4px;
+}
+
+textarea, input[type="text"], input[type="password"] {
+	border: 1px solid #CCC;
+	outline: 0 none;
+	padding: 5px 0px 5px 5px;
+	border-radius: 4px;
+}
+
+p {
+	margin: 0;
+	font-size: 15;
+}
+
+#parent-content {
+	text-align: center;
+}
+
+#content {
+	display: inline-block;
+	text-align: justify;
+}
+
+#form {
+	text-align: center;
+}
+
+#title {
+	width: 400;
+}
+
+#blog {
+	height: 50%;
+	width: 1000px;
+}

@@ -1,0 +1,43 @@
+<html>
+	<head>
+		<title>GROK PEACE</title>
+		<link rel="shortcut icon" type="image/x-icon" href="favicon.ico"/>
+
+		<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open Sans">
+		<link rel="stylesheet" type="text/css" href="index.css">
+	</head>
+	<body>
+		<div id="banner">
+			<div id="title">GROKKING EQUANIMITY</div>
+			<table id="subbanner"><tr><td>
+				<div id="defs">grok - understanding something intuitively or by empathy<br>
+					equanimity - mental calmness, composure, and evenness of temper, especially in a difficult situation
+				</div></td><td>
+				<div id="links">
+				</div></td></tr>
+			</table>
+		</div>
+		<div id="content"></div>
+	</body>
+	<script type="text/javascript">
+	function setContent(file)
+	{
+		var xmlHttp = new XMLHttpRequest();
+		xmlHttp.open("GET", file, true);
+		xmlHttp.onload = function(e){
+			if(xmlHttp.readyState === 4){
+				if(xmlHttp.status === 200){
+					document.getElementById("content").innerHTML = xmlHttp.responseText;
+				}else{
+					console.error(xmlHttp.statusText);
+				}
+			}
+		};
+		xmlHttp.onerror = function(e){
+			console.error(xmlHttp.statusText);
+		}
+		xmlHttp.send(null);
+	}
+	setContent("posts.html");
+	</script>
+</html>

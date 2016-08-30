@@ -1,0 +1,69 @@
+<html>
+	<head>
+	<title>LISP</title>
+
+		<link rel="stylesheet" type="text/css" href="lisp.css">
+
+		<script type="text/javascript" src="lisp.js"></script>
+
+		<script type="text/javascript" src="lisp-core.js"></script>
+		<script type="text/javascript" src="lisp-math.js"></script>
+	</head>
+
+	<body>
+		<h3>LISP</h3>
+		<strong>L</strong>isp <strong>I</strong>s <strong>S</strong>yntactically <strong>P</strong>ure!
+		https://common-lisp.net/project/parenscript/
+		<p>Enter your code in the text areas. The syntax delimiters are defined. Note, tabs and newlines are ignored.</p>
+		<hr>
+		<p>Left Delimiter: '('</p>
+		<p>Item Delimiter: ' ' (space)</p>
+		<p>Right Delimiter: ')'</p>
+		<hr>
+		<h3>Output</h3>
+		<p>Tokenized Output:</p>
+		<div id="token-output"></div>
+		<p>Evaluated Output (like a console):</p>
+		<textarea id="output" rows="5" cols="80"></textarea>
+		<br>
+		<hr>
+		<h3>Samples</h3>
+		<table>
+			<tr>
+				<td><textarea id="code1" rows="8" cols="80">some lisp items dont matter
+
+some more text makes more lisp items matter less
+
+(these items are within a single item, however)
+
+(here (is some (nested goop () ()) ()))</textarea></td>
+				<td><button type="button" onclick="evaluate_lisp(document.getElementById('code1').value)">Tokenize & Evaluate</button></td>
+			</tr>
+
+			<tr>
+				<td><textarea id="code2" rows="2" cols="80">(print (string This is a math example: 2^2*PI= ) (* (power 2 2) PI))</textarea></td>
+				<td><button type="button" onclick="evaluate_lisp(document.getElementById('code2').value)">Tokenize & Evaluate</button></td>
+			</tr>
+
+			<tr>
+				<td><textarea id="code3" rows="2" cols="80">your number is (+ (+ 10000 (* (* 2 2) 3.33)) 0.00000001) + (* 3 4)??</textarea></td>
+				<td><button type="button" onclick="evaluate_lisp(document.getElementById('code3').value)">Tokenize & Evaluate</button></td>
+			</tr>
+
+			<tr>
+				<td><textarea id="code4" rows="2" cols="80">(+ (- (* (/ 100 5) 3) 42) 3)</textarea></td>
+				<td><button type="button" onclick="evaluate_lisp(document.getElementById('code4').value)">Tokenize & Evaluate</button></td>
+			</tr>
+
+			<tr>
+				<td><textarea id="code5" rows="2" cols="80">doin an alert (alert YO YO apples equals (* 2 3)) did it?</textarea></td>
+				<td><button type="button" onclick="evaluate_lisp(document.getElementById('code5').value)">Tokenize & Evaluate</button></td>
+			</tr>
+
+			<tr>
+				<td><textarea id="code6" rows="2" cols="80">doin an AJAX BOI (ajax https://www.timeapi.org/utc/now) did it?</textarea></td>
+				<td><button type="button" onclick="evaluate_lisp(document.getElementById('code6').value)">Tokenize & Evaluate</button></td>
+			</tr>
+		</table>
+	</body>
+</html>

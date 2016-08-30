@@ -1,0 +1,6 @@
+{
+	"port":8000,
+	"host":"www.webservice.com",
+	"postgres_connection_string":"dbname=webservice user=postgres password=aq12ws",
+	"argon2_salt":"makesuretouse16!"
+}

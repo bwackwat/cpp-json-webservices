@@ -1,2 +1,4 @@
-WebService
-build.log
+webservice
+*.log
+*.jpg
+*.JPG

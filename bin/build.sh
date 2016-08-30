@@ -4,9 +4,18 @@ echo "|                                                  |"
 echo "|                                                  |"
 echo "|                                                  |"
 
-clang++ -std=c++11 -g -O0 -Wall -pedantic\
- -lboost_system -lboost_thread -lpqxx -lpq -largon2 -lcryptopp\
- -lredox -lev -lhiredis\
- *.cpp -o WebService &> build.log
+rm build.log
 
-cat build.log | more
+clang++ -std=c++11 -g -O3 -Wall -pedantic\
+ -lboost_system -lboost_thread -lpqxx -lpq -largon2 -lcryptopp\
+ *.cpp -o webservice &> build.log
+
+less build.log
+
+rm run.log
+
+killall webservice
+./webservice > run.log 2>&1 &
+
+tail -f run.log
+

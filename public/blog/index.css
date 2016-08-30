@@ -1,0 +1,55 @@
+html {
+	font-family: "Open Sans";
+	min-width: 800px;
+}
+
+body {
+	margin: 0;
+	color: white;
+	background-color: seagreen;
+}
+
+hr {
+	border-color: black;
+	border-style: solid;
+	border-width: 4px;
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+
+#banner {
+	background-color: black;
+}
+
+#title {
+	text-align: center;
+	font-size: 40;
+	font-weight: bold;
+}
+
+#defs {
+	font-size: 10;
+}
+
+#content {
+	text-align: center;
+	margin-top: 50px;
+}
+
+#posts {
+	display: inline-block;
+	width: 70%;
+	text-align: justify;
+}
+
+#posttitle {
+	font-size: 20;
+}
+
+#postdate {
+	font-size: 14;
+}
+
+#posttext {
+	font-size: 14;
+}

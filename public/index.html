@@ -1,52 +1,37 @@
-<!DOCTYPE HTML>
 <html>
 	<head>
-		<title>Flask API - POI Map</title>
-
-		<link rel="stylesheet" type="text/css" href="index.css">
-
-		<script src="OpenLayers.js"></script>
-
+		<title>bwackwat</title>
+		<link rel='icon' type='image/x-icon' href='favicon.png'/>
 		<script src="index.js"></script>
 	</head>
-
 	<body>
-		<div id="banner">
-			<h4 style="margin: 4px;">&nbsp;&nbsp;&nbsp;&#1422;&nbsp;&nbsp;&nbsp;&#1421;&nbsp;&nbsp;&nbsp;&#1422;&nbsp;&nbsp;&nbsp;&nbsp;(latest version of Chrome browser, recommended)<div id="status" style="float: right">Welcome!</div></h4>
-		</div>
-
-		<div id="demoMap"></div>
-
-		<dialog id="signupModal" class="modal">
-			<h3>Signup</h3>
-			<h4 class="result" id="signupResult"></h4>
-			<input id="signupUsername" type="text" placeholder="username"><br>
-			<input id="signupEmail" type="text" placeholder="email"><br>
-			<input id="signupPassword" type="password" placeholder="password"><br>
-			<button id="signupButton">Signup</button>
-			<button id="cancelSignupButton">Maybe Later</button>
-		</dialog>
-
-		<dialog id="loginModal" class="modal">
-			<h3>Login to save your points of interest!</h3>
-			<h4 class="result" id="loginResult"></h4>
-			<input id="username" type="text" placeholder="username"><br>
-			<input id="password" type="password" placeholder="password"><br>
-			<button id="loginButton">Login</button>
-			<button id="cancelLoginButton">Maybe Later</button><br>
-			<h4>Or maybe you need to...</h4>
-			<button id="goToSignup">Signup</button>
-		</dialog>
-
-		<dialog id="poiModal" class="modal">
-			<h3>Enter some information about this point of interest!</h3>
-			<h4>Position: <div id="poiLongitude"></div>, <div id="poiLatitude"></div></h4>
-			<input type="text" placeholder="location label" id="poiLabel"><br>
-			<input type="text" placeholder="location description" id="poiDescription"><br>
-			<button id="savePoi">Save</button>
-			<button id="cancelPoi">Cancel/Close</button><br>
-			<h4>Or maybe you just want to...</h4>
-			<button id="logout">Logout</button>
-		</dialog>
+		<h1>Welcome!</h1>
+		<div>Status: <p id="status"></p></div>
+		<input type="text" id="usernameField" placeholder="username"/><br>
+		<input type="password" id="passwordField" placeholder="password"/><br>
+		<input id="loginButton" type="button" value="Login/Register"/><br>
+		<input id="logoutButton" type="button" value="Logout"/>
+		<hr>
+		<a href="portfolio">Portfolio</a>
+		<br>
+		<a href="blog">Blog</a>
+		<br>
+		<a href="cms">CMS</a>
+		<br>
+		<a href="poi">Point of Interest Map</a>
+		<br>
+		<a href="api">API</a>
+		<hr>
+		<h1>In Development</h1>
+		<a href='asteroids/'><h3>asteroids</h3></a>
+		<a href='boxgame/'><h3>boxgame</h3></a>
+		<a href='chat/'><h3>chat</h3></a>
+		<a href='drawingboard/'><h3>drawingboard</h3></a>
+		<a href='file-index/'><h3>file-index</h3></a>
+		<a href='lisp/'><h3>lisp</h3></a>
+		<a href='media/'><h3>media</h3></a>
+		<a href='teamchat/'><h3>teamchat</h3></a>
+		<a href='top/'><h3>top</h3></a>
+		<img src='media/blackrat.svg' height='200'/>
 	</body>
 </html>

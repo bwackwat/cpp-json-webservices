@@ -10,7 +10,8 @@ yum -y upgrade
 # Packages
 
 yum -y install epel-release gcc
-yum -y install vim cmake nginx clang fail2ban rkhunter postgresql-server postgresql-contrib
+yum -y install vim cmake nginx clang fail2ban rkhunter
+yum -y install postgresql-server postgresql-contrib postgresql-libs
 yum -y install libstdc++-static libstdc++ cryptopp cryptopp-devel boost boost-devel libpqxx libpqxx-devel libev postgis
 
 # File Setup
@@ -49,6 +50,8 @@ mv ./phc-winner-argon2/include/argon2.h /usr/include/
 cd phc-winner-argon2
 make
 mv ./libargon2.so /usr/local/lib/
+cp /usr/local/lib/libargon2.so /lib64/
+cp /lib64/libargon2.so /lib64/libargon2.so.0
 ldconfig
 cd ../
 
@@ -62,20 +65,12 @@ cp -rf ./rapidjson/include/rapidjson /usr/include/
 
 # PostgreSQL Configuration
 
-mkdir -p /data
-passwd postgres
-chown postgres:postgres /data
-chmod 666 /root/raw-json-webservices/bin/tables.sql
-chown postgres:postgres /root/raw-json-webservices/bin/tables.sql
-cp /root/raw-json-webservices/bin/tables.sql /home
+chmod 666 bin/tables.sql
+chown postgres:postgres bin/tables.sql
 
+postgresql-setup initdb
 #initdb /data/ -E UTF8 --locale=en_US.UTF8
 #pg_ctl -D /data -l logfile start
-postgresql-setup initdb
-su - postgres
-psql -c "CREATE DATABASE webservice OWNER postgres;"
-su root
-psql -U postgres -d webservice -a -f ./bin/tables.sql
 
 
 #Only change is 
@@ -87,3 +82,8 @@ cp ./bin/pg_hba.conf /var/lib/pgsql/data/pg_hba.conf
 
 systemctl start postgresql
 systemctl enable postgresql
+
+su - postgres
+psql -c "CREATE DATABASE webservice OWNER postgres;"
+su root
+psql -U postgres -d webservice -a -f ./bin/tables.sql

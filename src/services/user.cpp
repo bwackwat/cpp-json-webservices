@@ -1,7 +1,7 @@
 std::string login(Document *json){
-	pqxx::result res = MyApi::repo->GetUserByLogin((*json)["login"].GetString());
+	pqxx::result res = MyApi::repo->GetUserByLogin((*json)["username"].GetString());
 	if(res.size() == 0){
-		return simple_error_json("Login does not exist.");
+		return simple_error_json("Username does not exist.");
 	}
 
 	std::string given_password_hashed = hash_password((*json)["password"].GetString());
@@ -42,7 +42,7 @@ std::string newuser(Document *json){
 	);
 	
 	if(res.size() != 0){
-		return simple_error_json("Login already exists.");
+		return simple_error_json("Username already exists.");
 	}
 	
 	res = MyApi::repo->CreateUser(

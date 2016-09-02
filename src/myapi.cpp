@@ -72,9 +72,9 @@ MyApi::MyApi(int port, std::string name, std::string connection_string, std::str
 	init_crypto(salt);
 	
 	route("/", root);
-	route("/user/new", newuser, {{"username", kStringType},{"password", kStringType},{"email", kStringType},{"first_name", kStringType},{"last_name", kStringType}});
 	route("/users", users, {{"token", kStringType}});
-	route("/login", login, {{"login", kStringType},{"password", kStringType}});
+	route("/login", login, {{"username", kStringType},{"password", kStringType}});
+	route("/register", newuser, {{"username", kStringType},{"password", kStringType},{"email", kStringType},{"first_name", kStringType},{"last_name", kStringType}});
 	
 	route("/poi", poi, {{"token", kStringType}});
 	route("/user/poi", getuserpoi, {{"token", kStringType}});

@@ -17,6 +17,8 @@ std::string getuserblogposts(Document* json){
 
 	for(pqxx::result::size_type i = 0; i < res.size(); i++){
 		writer.StartObject();
+		writer.String("id");
+		writer.String(res[i]["id"].as<const char *>());
 		writer.String("title");
 		writer.String(res[i]["title"].as<const char *>());
 		writer.String("content");

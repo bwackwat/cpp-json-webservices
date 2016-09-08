@@ -49,6 +49,9 @@ Connection::Connection(WebService* service, asio::io_service& io_service)
 }
 
 void Connection::start_receiving(){
+	// Connection success.
+	std::cout << "CONN: |" << this->conn_socket.remote_endpoint().address().to_string() << std::endl;
+
 	conn_socket.async_read_some(asio::buffer(received_data, 1024), bind(&Connection::received, this, asio::placeholders::error, asio::placeholders::bytes_transferred));
 }
 
@@ -105,7 +108,12 @@ void Connection::delivered_done(const system::error_code& ec, std::size_t length
 	if (ec) {
 		std::cout << "delivered_done async_write_some error (" << ec.value() << "): " << ec.message() << std::endl;
 	}
-	conn_socket.shutdown(asio::ip::tcp::socket::shutdown_both);
-	conn_socket.close();
-	delete this;
+
+	//HTTP 1.1
+	conn_socket.async_read_some(asio::buffer(received_data, 1024), bind(&Connection::received, this, asio::placeholders::error, asio::placeholders::bytes_transferred));
+
+	//HTTP 1.0
+	//conn_socket.shutdown(asio::ip::tcp::socket::shutdown_both);
+	//conn_socket.close();
+	//delete this;
 }

@@ -67,18 +67,18 @@ pqxx::result PostgresRepository::CreateUser(std::string username, std::string pa
 
 pqxx::result PostgresRepository::GetBlogPostsByUserId(std::string id){
 	pqxx::work txn(conn);
-	return SQLWrap(&txn, "SELECT title, text, created_on FROM posts WHERE "
+	return SQLWrap(&txn, "SELECT id, title, content, created_on FROM posts WHERE "
 		"owner_id = " + txn.quote(id) + ";");
 }
 
-pqxx::result PostgresRepository::CreateBlogPost(std::string owner, std::string title, std::string text){
+pqxx::result PostgresRepository::CreateBlogPost(std::string owner, std::string title, std::string content){
 	pqxx::work txn(conn);
 	return SQLWrap(&txn, "INSERT INTO posts"
-		"(id, owner_id, title, text) "
+		"(id, owner_id, title, content) "
 		"VALUES (DEFAULT, " +
 		txn.quote(owner) + ", " +
 		txn.quote(title) + ", " +
-		txn.quote(text) +
+		txn.quote(content) +
 		") RETURNING id;");
 }
 

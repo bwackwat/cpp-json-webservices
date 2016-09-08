@@ -1,5 +1,9 @@
 #!/bin/bash
+
+# Exit on error.
 set -e
+# Echo commands.
+set -x
 
 # This has been tested primarily on CentOS 7, in 2016.
 # This was initiated in production August 26th, 2016.
@@ -19,24 +23,11 @@ yum -y install libstdc++-static libstdc++ cryptopp cryptopp-devel boost boost-de
 mkdir -p /etc/nginx/log
 chown nginx:nginx /etc/nginx/log
 
+git clone https://github.com/bwackwat/friendly-adventure ../friendly-adventure
 mkdir -p /etc/nginx/html
-cp -rn ./public/* /etc/nginx/html
+cp -rn ../friendly-adventure/* /etc/nginx/html
 mv -n /etc/nginx/nginx.conf /etc/nginx/nginx.conf.orig
 cp -n ./bin/nginx.conf /etc/nginx/nginx.conf
-
-mkdir -p /etc/nginx/ssl
-#Generate key.
-openssl genrsa -des3 -out /etc/nginx/ssl/webservice.key 2048
-#Generate certificate signing request.
-openssl req -new -key /etc/nginx/ssl/webservice.key -out /etc/nginx/ssl/webservice.csr
-cp /etc/nginx/ssl/webservice.key /etc/nginx/ssl/webservice.key.orig
-#Remove passphrase from key.
-openssl rsa -in /etc/nginx/ssl/webservice.key.orig -out /etc/nginx/ssl/webservice.key
-#Generate certificate.
-openssl x509 -req -days 365 -in /etc/nginx/ssl/webservice.csr -signkey /etc/nginx/ssl/webservice.key -out /etc/nginx/ssl/webservice.crt
-
-systemctl restart nginx
-systemctl enable nginx
 
 setsebool httpd_can_network_connect 1
 
@@ -85,5 +76,23 @@ systemctl enable postgresql
 
 su - postgres
 psql -c "CREATE DATABASE webservice OWNER postgres;"
-su root
+su - root
+
+exit
+
+MUST DO FOLLOWING MANUALLY or cry to death
+
+mkdir -p /etc/nginx/ssl
+#Generate key.
+openssl genrsa -des3 -out /etc/nginx/ssl/webservice.key 2048
+#Generate certificate signing request.
+openssl req -new -key /etc/nginx/ssl/webservice.key -out /etc/nginx/ssl/webservice.csr
+cp /etc/nginx/ssl/webservice.key /etc/nginx/ssl/webservice.key.orig
+#Remove passphrase from key.
+openssl rsa -in /etc/nginx/ssl/webservice.key.orig -out /etc/nginx/ssl/webservice.key
+#Generate certificate.
+openssl x509 -req -days 365 -in /etc/nginx/ssl/webservice.csr -signkey /etc/nginx/ssl/webservice.key -out /etc/nginx/ssl/webservice.crt
+
+systemctl restart nginx
+systemctl enable nginx
 psql -U postgres -d webservice -a -f ./bin/tables.sql

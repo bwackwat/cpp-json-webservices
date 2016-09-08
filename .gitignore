@@ -1,2 +1,4 @@
 webservice
 *.log
+phc-winner-argon2\
+rapidjson\

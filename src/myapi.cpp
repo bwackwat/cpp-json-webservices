@@ -74,11 +74,14 @@ MyApi::MyApi(int port, std::string name, std::string connection_string, std::str
 	route("/", root);
 	route("/users", users, {{"token", kStringType}});
 	route("/login", login, {{"username", kStringType},{"password", kStringType}});
-	route("/register", newuser, {{"username", kStringType},{"password", kStringType},{"email", kStringType},{"first_name", kStringType},{"last_name", kStringType}});
+	route("/user/new", newuser, {{"username", kStringType},{"password", kStringType},{"email", kStringType},{"first_name", kStringType},{"last_name", kStringType}});
 	
 	route("/poi", poi, {{"token", kStringType}});
 	route("/user/poi", getuserpoi, {{"token", kStringType}});
 	route("/poi/new", newpoi, {{"token", kStringType}, {"label", kStringType}, {"description", kStringType}, {"longitude", kNumberType}, {"latitude", kNumberType}});
+
+	route("/user/blog", getuserblogposts, {{"token", kStringType}});
+	route("/blog/new", newblogpost, {{"token", kStringType}, {"title", kStringType}, {"content", kStringType}});
 
 	for(auto iter = routes.begin(); iter != routes.end(); ++iter){
 		routelist << "{\"" + iter->first + "\":[";

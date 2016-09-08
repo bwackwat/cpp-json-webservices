@@ -36,6 +36,7 @@ std::string login(Document *json){
 }	
 
 std::string newuser(Document *json){
+
 	pqxx::result res = MyApi::repo->GetUserByUsernameOrEmail(
 		(*json)["username"].GetString(),
 		(*json)["email"].GetString()
@@ -43,6 +44,22 @@ std::string newuser(Document *json){
 	
 	if(res.size() != 0){
 		return simple_error_json("Username already exists.");
+	}
+
+	if(strlen((*json)["username"].GetString()) < 8){
+		return simple_error_json("Username must be at least 8 characters.");
+	}
+	if(strlen((*json)["password"].GetString()) < 8){
+		return simple_error_json("Password must be at least 8 characters.");
+	}
+	if(strlen((*json)["email"].GetString()) < 8){
+		return simple_error_json("I doubt that is your email address.");
+	}
+	if(strlen((*json)["first_name"].GetString()) < 2){
+		return simple_error_json("I doubt that is your first name.");
+	}
+	if(strlen((*json)["last_name"].GetString()) < 2){
+		return simple_error_json("I doubt that is your last name.");
 	}
 	
 	res = MyApi::repo->CreateUser(

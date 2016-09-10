@@ -1,3 +1,14 @@
+std::string tokencheck(Document *json){
+	Document tokendata;
+	try{
+		GetTokenData(&tokendata, json);
+	}catch(std::exception& e){
+		return simple_error_json(e.what());
+	}
+
+	return "{\"result\":\"Token is good.\"}";
+}
+
 std::string login(Document *json){
 	pqxx::result res = MyApi::repo->GetUserByLogin((*json)["username"].GetString());
 	if(res.size() == 0){
@@ -33,10 +44,9 @@ std::string login(Document *json){
 	writer.EndObject();
 
 	return response_buffer.GetString();
-}	
+}
 
 std::string newuser(Document *json){
-
 	pqxx::result res = MyApi::repo->GetUserByUsernameOrEmail(
 		(*json)["username"].GetString(),
 		(*json)["email"].GetString()

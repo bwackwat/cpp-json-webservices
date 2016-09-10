@@ -72,6 +72,7 @@ MyApi::MyApi(int port, std::string name, std::string connection_string, std::str
 	init_crypto(salt);
 	
 	route("/", root);
+	route("/token", tokencheck, {{"token", kStringType}});
 	route("/user", users, {{"token", kStringType}});
 	route("/login", login, {{"username", kStringType},{"password", kStringType}});
 	route("/user/new", newuser, {{"username", kStringType},{"password", kStringType},{"email", kStringType},{"first_name", kStringType},{"last_name", kStringType}});
@@ -83,6 +84,7 @@ MyApi::MyApi(int port, std::string name, std::string connection_string, std::str
 	route("/blog", GetBlogPostsByUsername, {{"username", kStringType}});
 	route("/user/blog", GetBlogPostsByToken, {{"token", kStringType}});
 	route("/blog/new", newblogpost, {{"token", kStringType}, {"title", kStringType}, {"content", kStringType}});
+	route("/blog/put", putblogpost, {{"token", kStringType}, {"id", kStringType}, {"title", kStringType}, {"content", kStringType}});
 
 	for(auto iter = routes.begin(); iter != routes.end(); ++iter){
 		routelist << "{\"" + iter->first + "\":[";

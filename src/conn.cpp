@@ -52,7 +52,7 @@ void Connection::start_receiving(){
 	// Connection success.
 	std::cout << "CONN: |" << this->conn_socket.remote_endpoint().address().to_string() << std::endl;
 
-	conn_socket.async_read_some(asio::buffer(received_data, 1024), bind(&Connection::received, this, asio::placeholders::error, asio::placeholders::bytes_transferred));
+	conn_socket.async_read_some(asio::buffer(received_data, 8192), bind(&Connection::received, this, asio::placeholders::error, asio::placeholders::bytes_transferred));
 }
 
 void Connection::received(const system::error_code& ec, std::size_t length) {

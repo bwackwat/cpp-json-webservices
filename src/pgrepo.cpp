@@ -82,6 +82,14 @@ pqxx::result PostgresRepository::CreateBlogPost(std::string owner, std::string t
 		") RETURNING id;");
 }
 
+pqxx::result PostgresRepository::UpdateBlogPost(std::string id, std::string title, std::string content){
+	pqxx::work txn(conn);
+	return SQLWrap(&txn, "UPDATE posts SET "
+		"title = " + txn.quote(title) + ", " +
+		"content = " + txn.quote(content) +
+		" WHERE id = " + txn.quote(id) + ";");
+}
+
 pqxx::result PostgresRepository::GetPoiByUserId(std::string id){
 	pqxx::work txn(conn);
 	return SQLWrap(&txn, "SELECT label, description, ST_AsGeoJSON(location) as location, created_on FROM poi WHERE "

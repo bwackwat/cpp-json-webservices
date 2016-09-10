@@ -18,6 +18,7 @@ public:
 	
 	pqxx::result GetBlogPostsByUserId(std::string id);
 	pqxx::result CreateBlogPost(std::string username, std::string title, std::string text);
+	pqxx::result UpdateBlogPost(std::string id, std::string title, std::string content);
 
 	pqxx::result GetPoiByUserId(std::string id);
 	pqxx::result CreatePoi(std::string owner, std::string label, std::string description, double longitude, double latitude);

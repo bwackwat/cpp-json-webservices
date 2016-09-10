@@ -66,6 +66,31 @@ std::string newblogpost(Document* json){
 
 	writer.StartObject();
 	writer.String("result");
+	writer.String("Successfully submitted the blog post.");
+	writer.EndObject();
+
+	return response_buffer.GetString();
+}
+
+std::string putblogpost(Document* json){
+	Document tokendata;
+	try{
+		GetTokenData(&tokendata, json);
+	}catch(std::exception& e){
+		return simple_error_json(e.what());
+	}
+	
+	pqxx::result res = MyApi::repo->UpdateBlogPost(
+		(*json)["id"].GetString(),
+		(*json)["title"].GetString(),
+		(*json)["content"].GetString()
+	);
+
+	StringBuffer response_buffer;
+	Writer<StringBuffer> writer(response_buffer);
+
+	writer.StartObject();
+	writer.String("result");
 	writer.String("Successfully saved the blog post.");
 	writer.EndObject();
 

@@ -15,7 +15,7 @@ public:
 private:
 	WebService* serv_reference;
 
-	char received_data[1024];
+	char received_data[8192];
 	std::string delivery_data;
 
 	void received(const system::error_code& ec, std::size_t length);

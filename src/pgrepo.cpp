@@ -68,7 +68,7 @@ pqxx::result PostgresRepository::CreateUser(std::string username, std::string pa
 pqxx::result PostgresRepository::GetBlogPostsByUserId(std::string id){
 	pqxx::work txn(conn);
 	return SQLWrap(&txn, "SELECT id, title, content, created_on FROM posts WHERE "
-		"owner_id = " + txn.quote(id) + ";");
+		"owner_id = " + txn.quote(id) + " ORDER BY created_on DESC;");
 }
 
 pqxx::result PostgresRepository::CreateBlogPost(std::string owner, std::string title, std::string content){

@@ -23,24 +23,25 @@ yum -y install libstdc++-static libstdc++ cryptopp cryptopp-devel boost boost-de
 mkdir -p /etc/nginx/log
 chown nginx:nginx /etc/nginx/log
 
-git clone https://github.com/bwackwat/friendly-adventure ../friendly-adventure
+if [ ! -d "../friendly-adventure" ]; then
+        git clone https://github.com/bwackwat/friendly-adventure ../friendly-adventure
+fi
 mkdir -p /etc/nginx/html
 cp -rn ../friendly-adventure/* /etc/nginx/html
-mv -n /etc/nginx/nginx.conf /etc/nginx/nginx.conf.orig
+cp -n /etc/nginx/nginx.conf /etc/nginx/nginx.conf.orig
 cp -n ./bin/nginx.conf /etc/nginx/nginx.conf
 
 setsebool httpd_can_network_connect 1
 
 # Argon2 Password Hashing Setup
 
-if [ -d "./phc-winner-argon2" ]; then
-	rm -r ./phc-winner-argon2
+if [ ! -d "./phc-winner-argon2" ]; then
+        git clone https://github.com/P-H-C/phc-winner-argon2.git
 fi
-git clone https://github.com/P-H-C/phc-winner-argon2.git
-mv ./phc-winner-argon2/include/argon2.h /usr/include/
+cp -n ./phc-winner-argon2/include/argon2.h /usr/include/
 cd phc-winner-argon2
 make
-mv ./libargon2.so /usr/local/lib/
+cp -n ./libargon2.so /usr/local/lib/
 cp /usr/local/lib/libargon2.so /lib64/
 cp /lib64/libargon2.so /lib64/libargon2.so.0
 ldconfig
@@ -48,18 +49,21 @@ cd ../
 
 # Rapidjson (header only) Setup
 
-if [ -d "./rapidjson" ]; then
-	rm -r ./rapidjson
+if [ ! -d "./rapidjson" ]; then
+        git clone https://github.com/miloyip/rapidjson.git
 fi
-git clone https://github.com/miloyip/rapidjson.git
-cp -rf ./rapidjson/include/rapidjson /usr/include/
+cp -rn ./rapidjson/include/rapidjson /usr/include/
 
 # PostgreSQL Configuration
 
 chmod 666 bin/tables.sql
 chown postgres:postgres bin/tables.sql
 
-postgresql-setup initdb
+export PGDATA=/data
+if [ ! -d "/data" ]; then
+        mkdir -p /data
+        postgresql-setup initdb
+fi
 #initdb /data/ -E UTF8 --locale=en_US.UTF8
 #pg_ctl -D /data -l logfile start
 
@@ -68,19 +72,11 @@ postgresql-setup initdb
 #host    all             all             127.0.0.1/32            ident
 #To
 #host    all             all             127.0.0.1/32            trust
-mv /var/lib/pgsql/data/pg_hba.conf /var/lib/pgsql/data/pg_hba.conf.orig
-cp ./bin/pg_hba.conf /var/lib/pgsql/data/pg_hba.conf
+mv -n /var/lib/pgsql/data/pg_hba.conf /var/lib/pgsql/data/pg_hba.conf.orig
+cp -f ./bin/pg_hba.conf /var/lib/pgsql/data/pg_hba.conf
 
 systemctl start postgresql
 systemctl enable postgresql
-
-su - postgres
-psql -c "CREATE DATABASE webservice OWNER postgres;"
-su - root
-
-exit
-
-MUST DO FOLLOWING MANUALLY or cry to death
 
 mkdir -p /etc/nginx/ssl
 
@@ -98,4 +94,5 @@ openssl x509 -req -days 365 -passin pass:$password -in /etc/nginx/ssl/webservice
 
 systemctl restart nginx
 systemctl enable nginx
+psql -U postgres -c "CREATE DATABASE webservice OWNER postgres;"
 psql -U postgres -d webservice -a -f ./bin/tables.sql

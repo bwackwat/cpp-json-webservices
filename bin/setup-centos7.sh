@@ -83,15 +83,18 @@ exit
 MUST DO FOLLOWING MANUALLY or cry to death
 
 mkdir -p /etc/nginx/ssl
+
+echo -n "Enter password for SSL key:" 
+read -s password
 #Generate key.
-openssl genrsa -des3 -out /etc/nginx/ssl/webservice.key 2048
+openssl genrsa -des3 -passout pass:$password -out /etc/nginx/ssl/webservice.key 2048
 #Generate certificate signing request.
-openssl req -new -key /etc/nginx/ssl/webservice.key -out /etc/nginx/ssl/webservice.csr
+openssl req -new -passin pass:$password -key /etc/nginx/ssl/webservice.key -out /etc/nginx/ssl/webservice.csr
 cp /etc/nginx/ssl/webservice.key /etc/nginx/ssl/webservice.key.orig
 #Remove passphrase from key.
-openssl rsa -in /etc/nginx/ssl/webservice.key.orig -out /etc/nginx/ssl/webservice.key
+openssl rsa -in /etc/nginx/ssl/webservice.key.orig -passin pass:$password -out /etc/nginx/ssl/webservice.key
 #Generate certificate.
-openssl x509 -req -days 365 -in /etc/nginx/ssl/webservice.csr -signkey /etc/nginx/ssl/webservice.key -out /etc/nginx/ssl/webservice.crt
+openssl x509 -req -days 365 -passin pass:$password -in /etc/nginx/ssl/webservice.csr -signkey /etc/nginx/ssl/webservice.key -out /etc/nginx/ssl/webservice.crt
 
 systemctl restart nginx
 systemctl enable nginx

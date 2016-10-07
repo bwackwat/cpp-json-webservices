@@ -29,7 +29,7 @@ fi
 mkdir -p /etc/nginx/html
 cp -rn ../friendly-adventure/* /etc/nginx/html
 cp -n /etc/nginx/nginx.conf /etc/nginx/nginx.conf.orig
-cp -n ./bin/nginx.conf /etc/nginx/nginx.conf
+/bin/cp -f ./bin/nginx.conf /etc/nginx/nginx.conf
 
 setsebool httpd_can_network_connect 1
 

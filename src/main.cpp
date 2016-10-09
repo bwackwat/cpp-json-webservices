@@ -46,12 +46,12 @@ int main(int argc, char** argv){
 	if(config.HasMember("postgres_connection_string")
 	&& config["postgres_connection_string"].GetType() == kStringType){
 		postgres_connection_string = config["postgres_connection_string"].GetString();
-		std::cout << "postgres_connection_string: " << postgres_connection_string << "\n";
+		std::cout << "postgres_connection_string: OBFUSCATED\n";
 	}
 
 	if(config.HasMember("argon2_salt") && config["argon2_salt"].GetType() == kStringType){
 		argon2_salt = config["argon2_salt"].GetString();
-		std::cout << "argon2_salt: " << argon2_salt << "\n";
+		std::cout << "argon2_salt: OBFUSCATED\n";
 	}
 
 	try{

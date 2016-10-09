@@ -14,7 +14,7 @@ yum -y upgrade
 # Packages
 
 yum -y install epel-release gcc
-yum -y install vim cmake nginx clang fail2ban rkhunter
+yum -y install vim cmake nginx clang fail2ban rkhunter certbot
 yum -y install postgresql-server postgresql-contrib postgresql-libs
 yum -y install libstdc++-static libstdc++ cryptopp cryptopp-devel boost boost-devel libpqxx libpqxx-devel libev postgis
 
@@ -31,7 +31,7 @@ cp -rn ../friendly-adventure/* /etc/nginx/html
 cp -n /etc/nginx/nginx.conf /etc/nginx/nginx.conf.orig
 /bin/cp -f ./bin/nginx.conf /etc/nginx/nginx.conf
 
-setsebool httpd_can_network_connect 1
+#setsebool httpd_can_network_connect 1
 
 # Argon2 Password Hashing Setup
 
@@ -80,17 +80,19 @@ systemctl enable postgresql
 
 mkdir -p /etc/nginx/ssl
 
-echo -n "Enter password for SSL key:" 
-read -s password
-#Generate key.
-openssl genrsa -des3 -passout pass:$password -out /etc/nginx/ssl/webservice.key 2048
-#Generate certificate signing request.
-openssl req -new -passin pass:$password -key /etc/nginx/ssl/webservice.key -out /etc/nginx/ssl/webservice.csr
-cp /etc/nginx/ssl/webservice.key /etc/nginx/ssl/webservice.key.orig
-#Remove passphrase from key.
-openssl rsa -in /etc/nginx/ssl/webservice.key.orig -passin pass:$password -out /etc/nginx/ssl/webservice.key
-#Generate certificate.
-openssl x509 -req -days 365 -passin pass:$password -in /etc/nginx/ssl/webservice.csr -signkey /etc/nginx/ssl/webservice.key -out /etc/nginx/ssl/webservice.crt
+#	echo -n "Enter password for SSL key:" 
+#	read -s password
+#	#Generate key.
+#	openssl genrsa -des3 -passout pass:$password -out /etc/nginx/ssl/webservice.key 2048
+#	#Generate certificate signing request.
+#	openssl req -new -passin pass:$password -key /etc/nginx/ssl/webservice.key -out /etc/nginx/ssl/webservice.csr
+#	cp /etc/nginx/ssl/webservice.key /etc/nginx/ssl/webservice.key.orig
+#	#Remove passphrase from key.
+#	openssl rsa -in /etc/nginx/ssl/webservice.key.orig -passin pass:$password -out /etc/nginx/ssl/webservice.key
+#	#Generate certificate.
+#	openssl x509 -req -days 365 -passin pass:$password -in /etc/nginx/ssl/webservice.csr -signkey /etc/nginx/ssl/webservice.key -out /etc/nginx/ssl/webservice.crt
+
+certbot certonly
 
 systemctl restart nginx
 systemctl enable nginx

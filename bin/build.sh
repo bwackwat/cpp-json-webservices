@@ -18,5 +18,3 @@ rm run.log
 killall webservice
 bin/webservice > run.log 2>&1 &
 
-tail -f run.log
-

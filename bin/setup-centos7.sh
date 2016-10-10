@@ -80,19 +80,21 @@ systemctl enable postgresql
 
 mkdir -p /etc/nginx/ssl
 
-#	echo -n "Enter password for SSL key:" 
-#	read -s password
-#	#Generate key.
-#	openssl genrsa -des3 -passout pass:$password -out /etc/nginx/ssl/webservice.key 2048
-#	#Generate certificate signing request.
-#	openssl req -new -passin pass:$password -key /etc/nginx/ssl/webservice.key -out /etc/nginx/ssl/webservice.csr
-#	cp /etc/nginx/ssl/webservice.key /etc/nginx/ssl/webservice.key.orig
-#	#Remove passphrase from key.
-#	openssl rsa -in /etc/nginx/ssl/webservice.key.orig -passin pass:$password -out /etc/nginx/ssl/webservice.key
-#	#Generate certificate.
-#	openssl x509 -req -days 365 -passin pass:$password -in /etc/nginx/ssl/webservice.csr -signkey /etc/nginx/ssl/webservice.key -out /etc/nginx/ssl/webservice.crt
+echo -n "Enter password for SSL key:" 
+read -s password
+#Generate key.
+openssl genrsa -des3 -passout pass:$password -out /etc/nginx/ssl/webservice.key 2048
+#Generate certificate signing request.
+openssl req -new -passin pass:$password -key /etc/nginx/ssl/webservice.key -out /etc/nginx/ssl/webservice.csr
+cp /etc/nginx/ssl/webservice.key /etc/nginx/ssl/webservice.key.orig
+#Remove passphrase from key.
+openssl rsa -in /etc/nginx/ssl/webservice.key.orig -passin pass:$password -out /etc/nginx/ssl/webservice.key
+#Generate certificate.
+openssl x509 -req -days 365 -passin pass:$password -in /etc/nginx/ssl/webservice.csr -signkey /etc/nginx/ssl/webservice.key -out /etc/nginx/ssl/webservice.crt
 
-certbot certonly
+openssl dhparam -out /etc/nginx/ssl/dhparam.pem 2048
+
+#certbot certonly
 
 systemctl restart nginx
 systemctl enable nginx

@@ -45,21 +45,51 @@ std::string validate_request(char *data, Document *doc, std::vector<std::pair<st
 
 Connection::Connection(WebService* service, asio::io_service& io_service)
 	: conn_socket(io_service),
-	serv_reference(service) {
+	serv_reference(service),
+	timeout_timer(io_service) {
 }
 
-void Connection::start_receiving(){
+void Connection::disconnect(const system::error_code& ec){
+	if (ec){
+		if (ec == asio::error::operation_aborted){
+			//Trashed this timerwith cancel();
+		}else{
+			std::cout << "disconnect async_wait error (" << ec.value() << "): " << ec.message() << std::endl;
+		}
+	}else{
+		std::cout << "DONE: |" << this->conn_socket.remote_endpoint().address().to_string() << std::endl;
+		
+		conn_socket.shutdown(asio::ip::tcp::socket::shutdown_both);
+		conn_socket.close();
+		delete this;
+	}
+}
+
+void Connection::start(){
 	// Connection success.
-	std::cout << "CONN: |" << this->conn_socket.remote_endpoint().address().to_string() << std::endl;
+	std::cout << "OPEN: |" << this->conn_socket.remote_endpoint().address().to_string() << std::endl;
 
-	conn_socket.async_read_some(asio::buffer(received_data, 8192), bind(&Connection::received, this, asio::placeholders::error, asio::placeholders::bytes_transferred));
+	receive();
 }
 
-void Connection::received(const system::error_code& ec, std::size_t length) {
+void Connection::receive(){
+	timeout_timer.expires_from_now(posix_time::seconds(READ_TIMEOUT));
+	timeout_timer.async_wait(bind(&Connection::disconnect, this, asio::placeholders::error));
+
+	conn_socket.async_read_some(asio::buffer(received_data, PACKET_LIMIT), bind(&Connection::received, this, asio::placeholders::error, asio::placeholders::bytes_transferred));
+}
+
+void Connection::received(const system::error_code& ec, std::size_t length){
 	if (ec) {
-		std::cout << "received async_read_some error (" << ec.value() << "): " << ec.message() << std::endl;
+		if (ec == asio::error::operation_aborted){
+			//Timed out! (Other error codes might need to land here as well/)
+		}else{
+			std::cout << "received async_read_some error (" << ec.value() << "): " << ec.message() << std::endl;
+		}
 		return;
 	}
+	timeout_timer.cancel();
+
 	received_data[length] = '\0';
 
 	char *pstart = strstr(received_data, " ") + 1;
@@ -91,8 +121,6 @@ void Connection::received(const system::error_code& ec, std::size_t length) {
 	}
 
 	delivery_data = "HTTP/1.1 200 OK\n";
-	delivery_data.append("Connection: close\n");
-	delivery_data.append("Server: " + serv_reference->GetName() + "\n");
 	delivery_data.append("Accept-Ranges: bytes\n");
 	delivery_data.append("Content-Type: application/json\n");
 	delivery_data.append("Content-Length: " + std::to_string(delivery_json.length()) + "\n");
@@ -104,16 +132,12 @@ void Connection::received(const system::error_code& ec, std::size_t length) {
 	conn_socket.async_write_some(asio::buffer(delivery_data, delivery_data.length()), bind(&Connection::delivered_done, this, asio::placeholders::error, asio::placeholders::bytes_transferred));
 }
 
-void Connection::delivered_done(const system::error_code& ec, std::size_t length) {
+void Connection::delivered_done(const system::error_code& ec, std::size_t length){
 	if (ec) {
 		std::cout << "delivered_done async_write_some error (" << ec.value() << "): " << ec.message() << std::endl;
+		disconnect(system::error_code());
+		return;
 	}
 
-	//HTTP 1.1
-	conn_socket.async_read_some(asio::buffer(received_data, 1024), bind(&Connection::received, this, asio::placeholders::error, asio::placeholders::bytes_transferred));
-
-	//HTTP 1.0
-	//conn_socket.shutdown(asio::ip::tcp::socket::shutdown_both);
-	//conn_socket.close();
-	//delete this;
+	receive();
 }

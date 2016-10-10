@@ -22,7 +22,7 @@ void WebService::connection_acceptor(const system::error_code& ec, Connection* n
 		return;
 	}
 
-	new_connection->start_receiving();
+	new_connection->start();
 
 	Connection* next_connection = new Connection(this, service_pool->get_io_service());
 

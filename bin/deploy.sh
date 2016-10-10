@@ -15,5 +15,10 @@ git pull
 
 systemctl restart nginx
 
-./bin/build.sh
+if [ "$1" == "--nobuild" ]; then
+    echo "Skipping build step (--nobuild)."
+else
+    echo "Doing build step (--nobuild missing)"
+    ./bin/build.sh
+fi
 

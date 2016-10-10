@@ -99,7 +99,7 @@ void Connection::received(const system::error_code& ec, std::size_t length){
 	std::cout << "PATH: |" << path << "|" << std::endl;
 
 	char *received_body = strstr(received_data, "\r\n\r\n") + 4;
-	std::cout << "DATA: |" << received_body << "|" << std::endl;
+	std::cout << "DATA: |" << received_body << "| " << std::strlen(received_data) << " bytes" << std::endl;
 
 	std::string delivery_json;
 
@@ -127,7 +127,7 @@ void Connection::received(const system::error_code& ec, std::size_t length){
 	delivery_data.append("\n");
 	delivery_data.append(delivery_json);
 	
-	std::cout << "DELI: |" << delivery_json << "|" << std::endl;
+	std::cout << "DELI: |" << delivery_json << "| " << delivery_data.length() << " bytes" << std::endl;
 
 	conn_socket.async_write_some(asio::buffer(delivery_data, delivery_data.length()), bind(&Connection::delivered_done, this, asio::placeholders::error, asio::placeholders::bytes_transferred));
 }

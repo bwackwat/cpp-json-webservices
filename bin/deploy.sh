@@ -15,9 +15,15 @@ git pull
 /bin/cp -r ../friendly-adventure/* /etc/nginx/html/
 /bin/cp ./bin/nginx.conf /etc/nginx/
 
+if [ "$@" == "--production" ]; then
+	sed "/#DEVELOPMENT$/d" /etc/nginx/nginx.conf
+else
+	sed "/#PRODUCTION$/d" /etc/nginx/nginx.conf
+fi
+
 systemctl restart nginx
 
-if [ "$1" == "--nobuild" ]; then
+if [ "$@" == "--nobuild" ]; then
     echo "Skipping build step (--nobuild)."
 else
     echo "Doing build step (--nobuild missing)"

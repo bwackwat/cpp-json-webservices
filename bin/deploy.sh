@@ -6,6 +6,8 @@ set -x
 cd ../friendly-adventure
 git pull
 
+python ../cpp-json-webservices/bin/templater.py
+
 cd ../cpp-json-webservices
 git pull
 

@@ -6,7 +6,7 @@ set -e
 set -x
 
 # This has been tested primarily on CentOS 7, in 2016.
-# This was initiated in production August 26th, 2016.
+# This was initiated in production October 8th, 2016.
 
 yum makecache fast
 yum -y upgrade
@@ -30,8 +30,6 @@ mkdir -p /etc/nginx/html
 cp -rn ../friendly-adventure/* /etc/nginx/html
 cp -n /etc/nginx/nginx.conf /etc/nginx/nginx.conf.orig
 /bin/cp -f ./bin/nginx.conf /etc/nginx/nginx.conf
-
-#setsebool httpd_can_network_connect 1
 
 # Argon2 Password Hashing Setup
 
@@ -67,7 +65,6 @@ fi
 #initdb /data/ -E UTF8 --locale=en_US.UTF8
 #pg_ctl -D /data -l logfile start
 
-
 #Only change is 
 #host    all             all             127.0.0.1/32            ident
 #To
@@ -95,6 +92,13 @@ openssl x509 -req -days 365 -passin pass:$password -in /etc/nginx/ssl/webservice
 openssl dhparam -out /etc/nginx/ssl/dhparam.pem 2048
 
 #certbot certonly
+
+if [ $(getenforce) == "Disabled" ]; then
+	echo "SELinux is disabled on this current install."
+else
+	echo "SELinux is enforcing on this current install. Setting httpd_can_network_connect to 1."
+	setsebool httpd_can_network_connect 1
+fi
 
 systemctl restart nginx
 systemctl enable nginx

@@ -16,5 +16,6 @@ cat build.log
 rm run.log
 
 killall webservice
+pkill --exact webservice
 bin/webservice > run.log 2>&1 &
 

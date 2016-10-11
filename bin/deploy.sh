@@ -13,12 +13,11 @@ git pull
 
 # THIS WONT WORK UNLESS THE USER EXECUTING THE SCRIPT OWNS THE ITEMS (bwackwat)
 /bin/cp -r ../friendly-adventure/* /etc/nginx/html/
-/bin/cp ./bin/nginx.conf /etc/nginx/
 
 if [ "$@" == "--production" ]; then
-	sed "/#DEVELOPMENT$/d" /etc/nginx/nginx.conf
+	sed "/#DEVELOPMENT$/d" ./bin/nginx.conf > /etc/nginx/nginx.conf
 else
-	sed "/#PRODUCTION$/d" /etc/nginx/nginx.conf
+	sed "/#PRODUCTION$/d" ./bin/nginx.conf > /etc/nginx/nginx.conf
 fi
 
 systemctl restart nginx

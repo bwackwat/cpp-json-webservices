@@ -1,66 +1,60 @@
+#include <stdlib.h>
+
 #include <iostream>
 #include <string>
 #include <stdexcept>
-
-#include "rapidjson/document.h"
-#include "rapidjson/filereadstream.h"
-
-using namespace rapidjson;
+#include <fstream>
 
 #include "myapi.hpp"
+#include "json.hpp"
 
 int main(int argc, char** argv){
 	int port = 8000;
-	std::string host = "www.webservice.com";
-	std::string postgres_connection_string = "server=localhost; db=webservice";
+	std::string hostname = "webservice.com";
+	std::string connection_string = "server=localhost; db=webservice";
 	std::string argon2_salt = "makesuretouse16!";
+	JsonObject config_json;
 	char buffer[65536];
-	FILE* configurationFile = fopen("bin/configuration.json", "rb");
-	if(configurationFile == 0){
-		std::cout << argv[0] << ": Configuration file error: " << errno << "\n";
-		return 1;
-	}
-	FileReadStream frs(configurationFile, buffer, sizeof(buffer));
-	Document config;
+
+	std::ifstream config_file("./bin/configuration.json");
+	std::string config_data((std::istreambuf_iterator<char>(config_file)),
+		(std::istreambuf_iterator<char>()));
+	config_json.parse(config_data.c_str());
+
+	std::cout << "Loaded: ./bin/configuration.json" << std::endl;
+	std::cout << config_json.stringify(true) << std::endl;
 	
-	config.ParseStream<0, UTF8<>, FileReadStream>(frs);
-
-	if(config.HasParseError()){
-		int offset = config.GetErrorOffset();
-		std::cerr << "Invalid configuration JSON at character " << offset << ": '" << buffer[offset] << ".\n";
-		return 1;
-	}else{
-		std::cout << "Using values from configuration.json:\n";
+	if(config_json.objectValues.count("port") &&
+	config_json.objectValues["port"]->type == STRING){
+		port = std::atoi(config_json.objectValues["port"]->stringValue.c_str());
 	}
+	std::cout << "port: " << port << std::endl;
 
-	if(config.HasMember("port") && config["port"].GetType() == kNumberType){
-		port = config["port"].GetInt();
-		std::cout << "port: " << port << "\n";
+	if(config_json.objectValues.count("hostname") &&
+	config_json.objectValues["hostname"]->type == STRING){
+		hostname = config_json.objectValues["hostname"]->stringValue;
 	}
+	std::cout << "hostname: " << hostname << std::endl;
 
-	if(config.HasMember("host") && config["host"].GetType() == kStringType){
-		host = config["host"].GetString();
-		std::cout << "host: " << host << "\n";
+	if(config_json.objectValues.count("connection_string") &&
+	config_json.objectValues["connection_string"]->type == STRING){
+		connection_string = config_json.objectValues["connection_string"]->stringValue;
 	}
+	std::cout << "connection_string: " << connection_string << std::endl;
 
-	if(config.HasMember("postgres_connection_string")
-	&& config["postgres_connection_string"].GetType() == kStringType){
-		postgres_connection_string = config["postgres_connection_string"].GetString();
-		std::cout << "postgres_connection_string: OBFUSCATED\n";
+	if(config_json.objectValues.count("argon2_salt") &&
+	config_json.objectValues["argon2_salt"]->type == STRING){
+		argon2_salt = config_json.objectValues["argon2_salt"]->stringValue;
 	}
-
-	if(config.HasMember("argon2_salt") && config["argon2_salt"].GetType() == kStringType){
-		argon2_salt = config["argon2_salt"].GetString();
-		std::cout << "argon2_salt: OBFUSCATED\n";
-	}
+	std::cout << "argon2_salt: " << argon2_salt << std::endl;
 
 	try{
-		MyApi api(port,	host, postgres_connection_string, argon2_salt);
+		MyApi api(port,	hostname, connection_string, argon2_salt);
 	}catch (std::exception& e){
 		std::cerr << "MyApi exception: " << e.what() << "\n";
 		std::getchar();
-		return 1;
 	}
 
-	return 0;
+	// Shouldn't end.
+	return 1;
 }

@@ -38,6 +38,7 @@ std::string hash_password(std::string password){
 	const size_t pwdlen = password.length();
 
 	//TODO: Should this be used??
+	//INFO: If this changes, user passwords in DB will become invalid.
 	std::string nonce = "itmyepicsalt!@12";
 	std::vector<uint8_t> saltvec(nonce.begin(), nonce.end());
 	uint8_t* salt = &saltvec[0];

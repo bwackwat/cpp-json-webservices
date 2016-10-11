@@ -5,43 +5,36 @@
 #include <string>
 #include <stdexcept>
 
-#include "rapidjson/document.h"
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
-
 #include <pqxx/pqxx>
 
 #include "myapi.hpp"
 #include "serv.hpp"
 #include "pgrepo.hpp"
 #include "util.hpp"
-
-using namespace rapidjson;
+#include "json.hpp"
 
 PostgresRepository* MyApi::repo;
 
-void GetTokenData(Document* token, Document* json){
+void GetTokenData(JsonObject* token, JsonObject* json){
 	std::string tokenjson;
 	try{
-		tokenjson = decrypt_from_webtoken((*json)["token"].GetString());
+		tokenjson = decrypt_from_webtoken(json->objectValues["token"]->stringValue);
 	}catch(const std::exception &e){
 		throw std::runtime_error("Invalid token.");
 	}
 	
-	if(token->Parse(tokenjson.c_str()).HasParseError()){
-		throw std::runtime_error("Token parse error.");
-	}
-	
-	if(!(*token).HasMember("id") ||
-	(*token)["id"].GetType() != kNumberType ||
-	!(*token).HasMember("username") ||
-	(*token)["username"].GetType() != kStringType ||
-	!(*token).HasMember("proof") ||
-	(*token)["proof"].GetType() != kStringType){
+	token->parse(tokenjson.c_str());
+
+	if(!(token->objectValues.count("id") &&
+	token->objectValues["id"].type == STRING &&
+	token->objectValues.count("username") &&
+	token->objectValues["username"].type == STRING &&
+	token->objectValues.count("proof") &&
+	token->objectValues["proof"].type == STRING)){
 		throw std::runtime_error("Token missing parameter.");
 	}
 	
-	pqxx::result res = MyApi::repo->GetUserById(std::to_string((*token)["id"].GetInt()));
+	pqxx::result res = MyApi::repo->GetUserById(token->objectValues["id"].stringValue);
 	
 	if(res.size() == 0){
 		throw std::runtime_error("Token with invalid username.");
@@ -49,14 +42,14 @@ void GetTokenData(Document* token, Document* json){
 	
 	std::string pwd = res[0]["password"].as<const char *>();
 	
-	if((*token)["proof"].GetString() != pwd.substr(pwd.length() / 2)){
+	if(token->objectValues["proof"]->stringValue != pwd.substr(pwd.length() / 2)){
 		throw std::runtime_error("Token with invalid password.");
 	}
 }
 
 std::stringstream routelist;
 
-std::string root(Document *json){
+std::string root(JsonObject *json){
 	return pretty("{\"result\":\"Welcome to the API.\",\"routes\":[" + routelist.str() + "]}");
 }
 

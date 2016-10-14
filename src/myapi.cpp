@@ -26,21 +26,21 @@ void GetTokenData(JsonObject* token, JsonObject* json){
 	token->parse(tokenjson.c_str());
 
 	if(!(token->objectValues.count("id") &&
-	token->objectValues["id"].type == STRING &&
+	token->objectValues["id"]->type == STRING &&
 	token->objectValues.count("username") &&
-	token->objectValues["username"].type == STRING &&
+	token->objectValues["username"]->type == STRING &&
 	token->objectValues.count("proof") &&
-	token->objectValues["proof"].type == STRING)){
+	token->objectValues["proof"]->type == STRING)){
 		throw std::runtime_error("Token missing parameter.");
 	}
 	
-	pqxx::result res = MyApi::repo->GetUserById(token->objectValues["id"].stringValue);
+	pqxx::result res = MyApi::repo->GetUserById(token->objectValues["id"]->stringValue);
 	
 	if(res.size() == 0){
 		throw std::runtime_error("Token with invalid username.");
 	}
 	
-	std::string pwd = res[0]["password"].as<const char *>();
+	std::string pwd = res[0]["password"].c_str();
 	
 	if(token->objectValues["proof"]->stringValue != pwd.substr(pwd.length() / 2)){
 		throw std::runtime_error("Token with invalid password.");
@@ -65,19 +65,19 @@ MyApi::MyApi(int port, std::string name, std::string connection_string, std::str
 	init_crypto(salt);
 	
 	route("/", root);
-	route("/token", tokencheck, {{"token", kStringType}});
-	route("/user", users, {{"token", kStringType}});
-	route("/login", login, {{"username", kStringType},{"password", kStringType}});
-	route("/user/new", newuser, {{"username", kStringType},{"password", kStringType},{"email", kStringType},{"first_name", kStringType},{"last_name", kStringType}});
+	route("/token", tokencheck, {{"token", STRING}});
+	route("/user", users, {{"token", STRING}});
+	route("/login", login, {{"username", STRING},{"password", STRING}});
+	route("/user/new", newuser, {{"username", STRING},{"password", STRING},{"email", STRING},{"first_name", STRING},{"last_name", STRING}});
 	
-	route("/poi", poi, {{"token", kStringType}});
-	route("/user/poi", getuserpoi, {{"token", kStringType}});
-	route("/poi/new", newpoi, {{"token", kStringType}, {"label", kStringType}, {"description", kStringType}, {"longitude", kNumberType}, {"latitude", kNumberType}});
+	route("/poi", poi, {{"token", STRING}});
+	route("/user/poi", getuserpoi, {{"token", STRING}});
+	route("/poi/new", newpoi, {{"token", STRING}, {"label", STRING}, {"description", STRING}, {"longitude", STRING}, {"latitude", STRING}});
 
-	route("/blog", GetBlogPostsByUsername, {{"username", kStringType}});
-	route("/user/blog", GetBlogPostsByToken, {{"token", kStringType}});
-	route("/blog/new", newblogpost, {{"token", kStringType}, {"title", kStringType}, {"content", kStringType}});
-	route("/blog/put", putblogpost, {{"token", kStringType}, {"id", kStringType}, {"title", kStringType}, {"content", kStringType}});
+	route("/blog", GetBlogPostsByUsername, {{"username", STRING}});
+	route("/user/blog", GetBlogPostsByToken, {{"token", STRING}});
+	route("/blog/new", newblogpost, {{"token", STRING}, {"title", STRING}, {"content", STRING}});
+	route("/blog/put", putblogpost, {{"token", STRING}, {"id", STRING}, {"title", STRING}, {"content", STRING}});
 
 	for(auto iter = routes.begin(); iter != routes.end(); ++iter){
 		routelist << "{\"" + iter->first + "\":[";

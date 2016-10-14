@@ -1,5 +1,5 @@
-std::string tokencheck(Document *json){
-	Document tokendata;
+std::string tokencheck(JsonObject *json){
+	JsonObject tokendata;
 	try{
 		GetTokenData(&tokendata, json);
 	}catch(std::exception& e){
@@ -9,93 +9,69 @@ std::string tokencheck(Document *json){
 	return "{\"result\":\"Token is good.\"}";
 }
 
-std::string login(Document *json){
-	pqxx::result res = MyApi::repo->GetUserByLogin((*json)["username"].GetString());
+std::string login(JsonObject *json){
+	pqxx::result res = MyApi::repo->GetUserByLogin(json->objectValues["username"]->stringValue);
 	if(res.size() == 0){
 		return simple_error_json("Username does not exist.");
 	}
 
-	std::string given_password_hashed = hash_password((*json)["password"].GetString());
-	if(given_password_hashed != res[0]["password"].as<const char *>()){
+	std::string given_password_hashed = hash_password(json->objectValues["password"]->stringValue);
+	if(given_password_hashed != res[0]["password"].c_str()){
 		return simple_error_json("Incorrect password.");
 	}
 	
-	StringBuffer token_buffer;
-	Writer<StringBuffer> token_writer(token_buffer);
+	std::stringstream token;
+	token << "{\"id\":\"" << res[0]["id"].c_str();
+	token << "\",\"username\":\"" << res[0]["username"].c_str();
+	token << "\",\"proof\":\"" << given_password_hashed.substr(given_password_hashed.length() / 2);
+	token << "\"}";
 
-	token_writer.StartObject();
-	token_writer.String("id");
-	token_writer.Int(res[0]["id"].as<int>());
-	token_writer.String("username");
-	token_writer.String(res[0]["username"].as<const char *>());
-	token_writer.String("proof");
-	token_writer.String(given_password_hashed.substr(given_password_hashed.length() / 2).c_str());
-	token_writer.EndObject();
+	std::stringstream response;
+	response << "{\"result\":{\"token\":\"";
+	response << encrypt_to_webtoken(token.str()) << "\"}}";
 
-	StringBuffer response_buffer;
-	Writer<StringBuffer> writer(response_buffer);
-
-	writer.StartObject();
-	writer.String("result");
-	writer.StartObject();
-	writer.String("token");
-	writer.String(encrypt_to_webtoken(token_buffer.GetString()).c_str());
-	writer.EndObject();
-	writer.EndObject();
-
-	return response_buffer.GetString();
+	return response.str();
 }
 
-std::string newuser(Document *json){
+std::string newuser(JsonObject *json){
 	pqxx::result res = MyApi::repo->GetUserByUsernameOrEmail(
-		(*json)["username"].GetString(),
-		(*json)["email"].GetString()
+		json->objectValues["username"]->stringValue,
+		json->objectValues["email"]->stringValue
 	);
 	
 	if(res.size() != 0){
 		return simple_error_json("Username already exists.");
 	}
 
-	if(strlen((*json)["username"].GetString()) < 8){
+	if(json->objectValues["username"]->stringValue.length() < 8){
 		return simple_error_json("Username must be at least 8 characters.");
 	}
-	if(strlen((*json)["password"].GetString()) < 8){
+	if(json->objectValues["password"]->stringValue.length() < 8){
 		return simple_error_json("Password must be at least 8 characters.");
 	}
-	if(strlen((*json)["email"].GetString()) < 8){
+	if(json->objectValues["email"]->stringValue.length() < 8){
 		return simple_error_json("I doubt that is your email address.");
 	}
-	if(strlen((*json)["first_name"].GetString()) < 2){
+	if(json->objectValues["first_name"]->stringValue.length() < 2){
 		return simple_error_json("I doubt that is your first name.");
 	}
-	if(strlen((*json)["last_name"].GetString()) < 2){
+	if(json->objectValues["last_name"]->stringValue.length() < 2){
 		return simple_error_json("I doubt that is your last name.");
 	}
 	
 	res = MyApi::repo->CreateUser(
-		(*json)["username"].GetString(),
-		hash_password((*json)["password"].GetString()),
-		(*json)["email"].GetString(),
-		(*json)["first_name"].GetString(),
-		(*json)["last_name"].GetString()
+		json->objectValues["username"]->stringValue,
+		hash_password(json->objectValues["password"]->stringValue),
+		json->objectValues["email"]->stringValue,
+		json->objectValues["first_name"]->stringValue,
+		json->objectValues["last_name"]->stringValue
 	);
 
-	StringBuffer response_buffer;
-	Writer<StringBuffer> writer(response_buffer);
-
-	writer.StartObject();
-	writer.String("result");
-	writer.StartObject();
-	writer.String("id");
-	writer.String(res[0]["id"].as<const char *>());
-	writer.EndObject();
-	writer.EndObject();
-
-	return response_buffer.GetString();
+	return "{\"result\":\"Successfully registered the user.\"}";
 }
 
-std::string users(Document *json){
-	Document tokendata;
+std::string users(JsonObject *json){
+	JsonObject tokendata;
 	try{
 		GetTokenData(&tokendata, json);
 	}catch(std::exception& e){
@@ -104,30 +80,19 @@ std::string users(Document *json){
 	
 	pqxx::result res = MyApi::repo->GetUsers();
 
-	StringBuffer response_buffer;
-	Writer<StringBuffer> writer(response_buffer);
-
-	writer.StartObject();
-	writer.String("result");
-	writer.StartArray();
-
+	std::stringstream response;
+	response << "{\"result\":[";
 	for(pqxx::result::size_type i = 0; i < res.size(); i++){
-		writer.StartObject();
-		writer.String("id");
-		writer.String(res[i]["id"].as<const char *>());
-		writer.String("username");
-		writer.String(res[i]["username"].as<const char *>());
-		writer.String("email");
-		writer.String(res[i]["email"].as<const char *>());
-		writer.String("first_name");
-		writer.String(res[i]["first_name"].as<const char *>());
-		writer.String("last_name");
-		writer.String(res[i]["last_name"].as<const char *>());
-		writer.EndObject();
+		response << "{\"id\":\"" << res[i]["id"].c_str() << "\",";
+		response << "\"username\":\"" << res[i]["username"].c_str() << "\",";
+		response << "\"email\":\"" << res[i]["email"].c_str() << "\",";
+		response << "\"first_name\":\"" << res[i]["first_name"].c_str() << "\",";
+		response << "\"last_name\":\"" << res[i]["last_name"].c_str() << "\"}";
+		if(i < res.size() - 1){
+			response << ',';
+		}
 	}
+	response << "}";
 
-	writer.EndArray();
-	writer.EndObject();
-
-	return response_buffer.GetString();
+	return response.str();
 }

@@ -6,15 +6,13 @@
 #include <boost/bind.hpp>
 #include <boost/chrono.hpp>
 
-#include "rapidjson/document.h"
-
 #include "pool.hpp"
 #include "util.hpp"
 #include "serv.hpp"
 #include "conn.hpp"
+#include "json.hpp"
 
 using namespace boost;
-using namespace rapidjson;
 
 void WebService::connection_acceptor(const system::error_code& ec, Connection* new_connection) {
 	if (ec) {		
@@ -36,7 +34,7 @@ WebService::WebService(int port, std::string service_name)
 	service_pool(new ServicePool()),
 	serv_acceptor(service_pool->get_io_service(), asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port)) {}
 
-void WebService::route(std::string path, std::string(*func)(Document *json), std::vector<std::pair<std::string, Type>> requires){
+void WebService::route(std::string path, std::string(*func)(JsonObject *json), std::vector<std::pair<std::string, JsonType>> requires){
 	WebService::routes[path] = func;
 	WebService::required_fields[path] = requires;
 }

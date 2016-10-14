@@ -31,9 +31,8 @@ public:
 	std::map<std::string, JsonObject*> objectValues;
 	std::vector<JsonObject*> arrayValues;
 
+	static std::string escape(std::string value);
 	const char* parse(const char* str);
 	std::string stringify(bool pretty = false, int depth = 0);
 	~JsonObject();
-private:
-	std::string escape(std::string value);
 };

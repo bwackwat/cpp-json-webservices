@@ -6,9 +6,8 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 
-#include "rapidjson/document.h"
+#include "json.hpp"
 
-using namespace rapidjson;
 using namespace boost;
 
 class Connection;
@@ -16,11 +15,11 @@ class ServicePool;
 
 class WebService {
 public:
-	std::map<std::string, std::string(*)(Document *json)> routes;
-	std::map<std::string, std::vector<std::pair<std::string, Type>>> required_fields;
+	std::map<std::string, std::string(*)(JsonObject* json)> routes;
+	std::map<std::string, std::vector<std::pair<std::string, JsonType>>> required_fields;
 
 	WebService(int port, std::string service_name);
-	void route(std::string path, std::string(*func)(Document *json), std::vector<std::pair<std::string, Type>> requires = {});
+	void route(std::string path, std::string(*func)(JsonObject* json), std::vector<std::pair<std::string, JsonType>> requires = {});
 	void listen();
 	std::string GetName();
 private:

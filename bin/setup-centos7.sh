@@ -13,8 +13,8 @@ yum -y upgrade
 
 # Packages
 
-yum -y install epel-release gcc
-yum -y install vim cmake nginx clang fail2ban rkhunter certbot
+yum -y install epel-release
+yum -y install cmake nginx clang fail2ban rkhunter certbot
 yum -y install postgresql-server postgresql-contrib postgresql-libs
 yum -y install libstdc++-static libstdc++ cryptopp cryptopp-devel boost boost-devel libpqxx libpqxx-devel libev postgis
 
@@ -45,12 +45,12 @@ cp /lib64/libargon2.so /lib64/libargon2.so.0
 ldconfig
 cd ../
 
-# Rapidjson (header only) Setup
+# ignorant-json Setup
 
-if [ ! -d "./rapidjson" ]; then
-        git clone https://github.com/miloyip/rapidjson.git
+if [ ! -d "../ignorant-json" ]; then
+        git clone https://github.com/bwackwat/ignorant-json ../ignorant-json
 fi
-cp -rn ./rapidjson/include/rapidjson /usr/include/
+/bin/cp ../ignorant-json/json.* ./src/
 
 # PostgreSQL Configuration
 

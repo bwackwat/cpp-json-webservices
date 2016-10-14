@@ -5,36 +5,23 @@
 #include <boost/asio.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include "rapidjson/document.h"
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
-#include "rapidjson/error/error.h"
-
 #include "util.hpp"
 #include "conn.hpp"
 #include "serv.hpp"
 #include "myapi.hpp"
+#include "json.hpp"
 
-using namespace rapidjson;
 using namespace boost;
 
-static const char* kTypeNames[] = { "Null", "False", "True", "Object", "Array", "String", "Number" };
-
-std::string validate_request(char *data, Document *doc, std::vector<std::pair<std::string, Type>> requires){
+std::string validate_request(char *data, JsonObject *json, std::vector<std::pair<std::string, JsonType>> requires){
 	std::stringstream response;
 
-	doc->Parse(data);
-	if (doc->HasParseError() && requires.size() > 0){
-		int offset = doc->GetErrorOffset();
-		response << "Invalid JSON at character " << offset << ": '" << data[offset] << "'.";
-
-		return simple_error_json(response.str());
-	}
+	json->parse(data);
 
 	for (std::vector<int>::size_type i = 0; i != requires.size(); i++){
-		if (!doc->HasMember(requires[i].first.c_str())
-		|| (*doc)[requires[i].first.c_str()].GetType() != requires[i].second){
-			response << "'" << requires[i].first << "' requires a " << kTypeNames[requires[i].second] << ".";
+		if (!json->objectValues.count(requires[i].first.c_str())
+		|| json->objectValues[requires[i].first.c_str()]->type != requires[i].second){
+			response << "'" << requires[i].first << "' requires a " << JsonObject::typeString[requires[i].second] << ".";
 
 			return simple_error_json(response.str());
 		}
@@ -106,14 +93,14 @@ void Connection::received(const system::error_code& ec, std::size_t length){
 	if (serv_reference->routes.count(path)){
 		auto f = serv_reference->routes[path];
 
-		Document doc;
+		JsonObject json;
 
-		auto result = validate_request(received_body, &doc, serv_reference->required_fields[path]);
+		auto result = validate_request(received_body, &json, serv_reference->required_fields[path]);
 		if (!result.empty()){
 			delivery_json = result;
 		}
 		else{
-			delivery_json = f(&doc);
+			delivery_json = f(&json);
 		}
 	}
 	else{

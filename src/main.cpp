@@ -14,11 +14,10 @@ int main(int argc, char** argv){
 	std::string connection_string = "server=localhost; db=webservice";
 	std::string argon2_salt = "makesuretouse16!";
 	JsonObject config_json;
-	char buffer[65536];
-
 	std::ifstream config_file("./bin/configuration.json");
 	std::string config_data((std::istreambuf_iterator<char>(config_file)),
 		(std::istreambuf_iterator<char>()));
+		
 	config_json.parse(config_data.c_str());
 
 	std::cout << "Loaded: ./bin/configuration.json" << std::endl;

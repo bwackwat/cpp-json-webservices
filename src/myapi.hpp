@@ -2,8 +2,6 @@
 
 #include "serv.hpp"
 
-using namespace rapidjson;
-
 class WebService;
 class PostgresRepository;
 

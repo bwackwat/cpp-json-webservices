@@ -11,6 +11,11 @@ python ../cpp-json-webservices/bin/templater.py
 cd ../cpp-json-webservices
 git pull
 
+cd ../ignorant-json
+git pull
+
+/bin/cp ../ignorant-json/json.* ./src/
+
 # THIS WONT WORK UNLESS THE USER EXECUTING THE SCRIPT OWNS THE ITEMS (bwackwat)
 /bin/cp -r ../friendly-adventure/* /etc/nginx/html/
 

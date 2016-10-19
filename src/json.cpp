@@ -161,11 +161,7 @@ std::string JsonObject::escape(std::string value){
 		value[i] == '\\'){
 			escaped << '\\';
 		}
-		if(value[i] == '\n'){
-			escaped << "\\n";
-		}else{
-			escaped << value[i];
-		}
+		escaped << value[i];
 	}
 	escaped << '"';
 	return escaped.str();

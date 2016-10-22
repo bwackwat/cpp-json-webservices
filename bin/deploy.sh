@@ -8,13 +8,13 @@ git pull
 
 python ../cpp-json-webservices/bin/templater.py
 
-cd ../cpp-json-webservices
-git pull
-
 cd ../ignorant-json
 git pull
 
 cd ../cpp-json-webservices
+git pull
+
+python ./bin/indexer.py /etc/nginx/html/
 
 /bin/cp ../ignorant-json/json.* ./src/
 

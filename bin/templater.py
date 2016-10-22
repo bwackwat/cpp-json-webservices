@@ -28,4 +28,4 @@ for root, dirs, files in os.walk(dir):
 		if file == TEMPLATE_NAME:
 			process_template(root)
 
-print "%s DONE!" % (sys.argv[0])
+print "DONE!"

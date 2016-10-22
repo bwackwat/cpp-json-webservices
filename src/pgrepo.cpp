@@ -73,6 +73,7 @@ pqxx::result PostgresRepository::GetBlogPostsByUserId(std::string id){
 
 pqxx::result PostgresRepository::CreateBlogPost(std::string owner, std::string title, std::string content){
 	pqxx::work txn(conn);
+	std::cout << "CONT:" << content << std::endl;
 	return SQLWrap(&txn, "INSERT INTO posts"
 		"(id, owner_id, title, content) "
 		"VALUES (DEFAULT, " +

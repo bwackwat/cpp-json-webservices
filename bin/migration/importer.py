@@ -1,16 +1,23 @@
-import requests, json, pyodbc
+#pip install requests
+#yum install gcc-c++ unixODBC-devel
+#pip install pyodbc
 
-response = requests.post("POST", "https://localhost/", json={"username":"bwackwat"})
+import requests, json, psycopg2
+
+response = requests.post("https://bwackwat.com/api/blog", json={"username":"bwackwat"}, verify=False)
 data = json.loads(response.content)
 
-connection = pyodbc.connect("DRIVER={PostgreSQL Unicode};DATABASE=postgres;UID=postgres;PWD=aq12ws;SERVER=localhost;")
+connection = psycopg2.connect("host='localhost' dbname='webservice' user='postgres' password='aq12ws'")
 cursor = connection.cursor()
 
-id = cursor.execute("SELECT * FROM users WHERE username='bwackwat' RETURNING id;")
-cursor.execute("DELETE * FROM info WHERE id='?';", id)
+cursor.execute("SELECT id FROM users WHERE username='bwackwat';")
+id = cursor.fetchall()[0][0]
 
-for item in data:
-    cursor.execute(("INSERT INTO info "
-                  "(id, data1, data2, data3) "
-                  "VALUES (?, ?, ?, ?);"), id, item.data1, item.data2, item.data3)
-    connection.commit()
+cursor.execute("DELETE FROM posts;")
+connection.commit()
+
+for item in data["result"]:
+	cursor.execute(("INSERT INTO posts "
+		"(owner_id, title, content, created_on) "
+		"VALUES (%s, %s, %s, %s);"), (id, item["title"], item["content"], item["created_on"]))
+	connection.commit()

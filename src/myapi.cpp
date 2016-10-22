@@ -47,10 +47,10 @@ void GetTokenData(JsonObject* token, JsonObject* json){
 	}
 }
 
-std::stringstream routelist;
+JsonObject routes_object;
 
 std::string root(JsonObject *json){
-	return pretty("{\"result\":\"Welcome to the API.\",\"routes\":[" + routelist.str() + "]}");
+	return routes_object.stringify(true);
 }
 
 #include "services/user.cpp"
@@ -79,19 +79,18 @@ MyApi::MyApi(int port, std::string name, std::string connection_string, std::str
 	route("/blog/new", newblogpost, {{"token", STRING}, {"title", STRING}, {"content", STRING}});
 	route("/blog/put", putblogpost, {{"token", STRING}, {"id", STRING}, {"title", STRING}, {"content", STRING}});
 
+	routes_object.type = OBJECT;
+	routes_object.objectValues["result"] = new JsonObject();
+	routes_object.objectValues["result"]->type = STRING;
+	routes_object.objectValues["result"]->stringValue = "Welcome to the API. This is a list of the routes and their required JSON parameters";
 	for(auto iter = routes.begin(); iter != routes.end(); ++iter){
-		routelist << "{\"" + iter->first + "\":[";
+		routes_object.objectValues[iter->first] = new JsonObject();
+		routes_object.objectValues[iter->first]->type = ARRAY;
 		for(auto &field : required_fields[iter->first]){
-			if(&field == &required_fields[iter->first].back()){
-				routelist << "\"" << field.first << "\"";
-			}else{
-				routelist << "\"" << field.first << "\"" << ",";
-			}
-		}
-		if(iter == --routes.end()){
-			routelist << "]}";
-		}else{
-			routelist << "]},";
+			JsonObject* array_item = new JsonObject();
+			array_item->type = STRING;
+			array_item->stringValue = field.first;
+			routes_object.objectValues[iter->first]->arrayValues.push_back(array_item);
 		}
 	}
 

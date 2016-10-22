@@ -31,6 +31,11 @@ const char* JsonObject::parse(const char* str){
 		switch(*it){
 		case '\\':
 			++it;
+			if(*it == 'n' ||
+			*it == 'r' ||
+			*it == 't'){
+				continue;
+			}
 			break;
 		case '"':
 			if(this->type == NOTYPE){
@@ -93,11 +98,11 @@ const char* JsonObject::parse(const char* str){
 				this->type = ARRAY;
 				DEBUG("START ARRAY")
 				continue;
-			}else if(this->type == STRING){
+			}/*else if(this->type == STRING){
 				this->stringValue = ss.str();
 				DEBUG("RESCUE STRING FROM ARRAY START")
 				return ++it;
-			}else if(this->type == ARRAY){
+			}*/else if(this->type == ARRAY){
 				value = new JsonObject();
 				it = value->parse(it);
 				arrayValues.push_back(value);
@@ -109,11 +114,11 @@ const char* JsonObject::parse(const char* str){
 			if(this->type == ARRAY){
 				DEBUG("ARRAYEND")
 				return it;
-			}else if(this->type == STRING){
+			}/*else if(this->type == STRING){
 				this->stringValue = ss.str();
 				DEBUG("RESCUE STRING FROM ARRAY END")
 				return it;
-			}else if(this->type == OBJECT){
+			}*/else if(this->type == OBJECT){
 				if(objState != GETKEY &&
 				objState != GETVALUE){
 					DEBUG("RESCUE OBJECT FROM ARRAY END")
@@ -158,10 +163,11 @@ std::string JsonObject::escape(std::string value){
 	escaped << '"';
 	for(int i = 0; i < value.length(); ++i){
 		if(value[i] == '"' ||
-		value[i] == '\\'){
-			escaped << '\\';
+		value[i] == '\\'){			
+			escaped << '\\' << value[i];
+		}else if(value[i] > 31){
+			escaped << value[i];
 		}
-		escaped << value[i];
 	}
 	escaped << '"';
 	return escaped.str();
